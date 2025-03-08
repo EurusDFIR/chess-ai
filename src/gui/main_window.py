@@ -166,7 +166,7 @@ def handle_mouse_motion(pos):
 # HÀM ĐỂ AI DI CHUYỂN
 def ai_move():
     import cProfile
-    import pstats  # Import ở đây, hoặc đầu file nếu thích
+    import pstats
 
     profiler = cProfile.Profile() # Tạo profiler
     profiler.enable() # Bắt đầu profiler
