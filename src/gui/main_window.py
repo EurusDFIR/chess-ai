@@ -13,7 +13,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from src.ai.minimax import get_best_move
 from src.ai.opening_book import OpeningBook
 
-BOOK_PATH = r"R:\TDMU\KIEN_THUC_TDMU\3_year_HK2\TriTueNT\chess-ai\opening_bin\gm2600.bin"  # Update this path to the downloaded book
+BOOK_PATH = r"R:\\TDMU\\KIEN_THUC_TDMU\\3_year_HK2\\TriTueNT\\chess-ai\\opening_bin\\gm2600.bin"  # Update this path to the downloaded book
 opening_book = OpeningBook(BOOK_PATH)
 
 
@@ -47,32 +47,35 @@ def run_gui():
     pygame.display.set_caption("Chess AI")
 
     # Màu sắc
-    global LIGHT, DARK
+    global LIGHT, DARK, HIGHLIGHT
     LIGHT = (235, 235, 208)
     DARK = (119, 149, 86)
+    HIGHLIGHT = (186, 202, 68)  # Màu để đánh dấu các ô có thể di chuyển
 
     # Khởi tạo bàn cờ
     global board
     board = chess.Board()
 
-
-
     global piece_images
     piece_images = load_pieces()
 
-# Vòng lặp chính
+    global dragging_piece, dragging_start_pos, legal_moves
+    dragging_piece = None
+    dragging_start_pos = None
+    legal_moves = []
+
+    # Vòng lặp chính
     running = True
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.MOUSEBUTTONDOWN and not board.is_game_over():
-                handle_mouse_click(event.pos)
-
-        # AI di chuyển (chơi quân đen)
-        # if board.turn == chess.BLACK and not board.is_game_over():
-        #     best_move = get_best_move(board, depth=3)
-        #     board.push(best_move)
+                handle_mouse_down(event.pos)
+            elif event.type == pygame.MOUSEBUTTONUP and not board.is_game_over():
+                handle_mouse_up(event.pos)
+            elif event.type == pygame.MOUSEMOTION and not board.is_game_over() and dragging_piece:
+                handle_mouse_motion(event.pos)
 
         # Cập nhật giao diện
         draw_board()
@@ -83,11 +86,17 @@ def run_gui():
 
 
 # Vẽ bàn cờ
-def draw_board():  # Ensure LIGHT and DARK are imported from the global scope
+def draw_board():
     for row in range(8):
         for col in range(8):
             color = LIGHT if (row + col) % 2 == 0 else DARK
             pygame.draw.rect(screen, color, (col * 64, row * 64, 64, 64))
+
+    if selected_square is not None:
+        for move in legal_moves:
+            row = 7 - (move.to_square // 8)
+            col = move.to_square % 8
+            pygame.draw.rect(screen, HIGHLIGHT, (col * 64, row * 64, 64, 64))
 
 
 # Vẽ quân cờ
@@ -95,20 +104,27 @@ def draw_pieces():
     for square in chess.SQUARES:
         piece = board.piece_at(square)
         if piece:
-            piece_symbol = piece.symbol() # Lấy ký hiệu quân cờ (có thể là 'R' hoặc 'r')
-            piece_name_lowercase = piece_symbol.lower() # Chuyển ký hiệu quân cờ thành chữ thường
-            piece_key = f"{'w' if piece.color else 'b'}{piece_name_lowercase}" # Tạo key với ký hiệu chữ thường
+            piece_symbol = piece.symbol()  # Lấy ký hiệu quân cờ (có thể là 'R' hoặc 'r')
+            piece_name_lowercase = piece_symbol.lower()  # Chuyển ký hiệu quân cờ thành chữ thường
+            piece_key = f"{'w' if piece.color else 'b'}{piece_name_lowercase}"  # Tạo key với ký hiệu chữ thường
             img = piece_images[piece_key]
             row = 7 - (square // 8)
             col = square % 8
             screen.blit(img, (col * 64, row * 64))
 
+    if dragging_piece:
+        screen.blit(dragging_piece, (dragging_start_pos[0] - 32, dragging_start_pos[1] - 32))
+
+
 # Xử lý di chuyển của người chơi
 selected_square = None
+dragging_piece = None
+dragging_start_pos = None
+legal_moves = []
 
 
-def handle_mouse_click(pos):
-    global selected_square
+def handle_mouse_down(pos):
+    global selected_square, dragging_piece, dragging_start_pos, legal_moves
     x, y = pos
     col = x // 64
     row = 7 - (y // 64)
@@ -118,18 +134,35 @@ def handle_mouse_click(pos):
         # Chọn quân cờ
         if board.piece_at(square) and board.piece_at(square).color == board.turn:
             selected_square = square
-    else:
-        # Di chuyển quân cờ
+            dragging_piece = piece_images[f"{'w' if board.piece_at(square).color else 'b'}{board.piece_at(square).symbol().lower()}"]
+            dragging_start_pos = pos
+            legal_moves = [move for move in board.legal_moves if move.from_square == selected_square]
+
+
+def handle_mouse_up(pos):
+    global selected_square, dragging_piece, dragging_start_pos, legal_moves
+    x, y = pos
+    col = x // 64
+    row = 7 - (y // 64)
+    square = chess.square(col, row)
+
+    if selected_square is not None:
         move = chess.Move(selected_square, square)
         if move in board.legal_moves:
             board.push(move)
+            # GỌI AI DI CHUYỂN NGAY SAU KHI NGƯỜI CHƠI ĐI THÀNH CÔNG
+            if not board.is_game_over() and board.turn == chess.BLACK:  # Kiểm tra game chưa kết thúc và đến lượt đen
+                ai_move()  # Gọi hàm ai_move để AI đi
         selected_square = None
-        # GỌI AI DI CHUYỂN NGAY SAU KHI NGƯỜI CHƠI ĐI THÀNH CÔNG
-        if not board.is_game_over() and board.turn == chess.BLACK:  # Kiểm tra game chưa kết thúc và đến lượt đen
-            ai_move()  # Gọi hàm ai_move để AI đi
+        dragging_piece = None
+        dragging_start_pos = None
+        legal_moves = []
 
-        else:
-            selected_square = None  # Hủy chọn nếu nước đi không hợp lệ
+
+def handle_mouse_motion(pos):
+    global dragging_start_pos
+    dragging_start_pos = pos
+
 
 # HÀM ĐỂ AI DI CHUYỂN
 def ai_move():
