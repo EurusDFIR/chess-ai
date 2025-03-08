@@ -4,7 +4,8 @@ import pygame
 import chess
 import os
 import sys
-
+import cProfile
+import pstats
 from src.game import board
 
 # Thêm đường dẫn để import từ thư mục gốc
@@ -26,15 +27,13 @@ def load_pieces():
         for name in piece_names:
             key = f"{color}{name.lower()}" # Chuyển name thành chữ thường ở đây
             path = os.path.join(os.path.dirname(__file__), "assets", "pieces", f"{color}{name}.png")
-            print(f"Đang thử load ảnh từ đường dẫn: {path}")
             try:
                 img = pygame.image.load(path).convert_alpha()
                 pieces[key] = img
-                print(f"Đã load thành công ảnh cho key: {key}")
+
             except pygame.error as e:
                 print(f"Lỗi load ảnh cho key {key} từ đường dẫn {path}: {e}")
     return pieces
-
 
 def run_gui():
     # Khởi tạo Pygame
@@ -166,10 +165,20 @@ def handle_mouse_motion(pos):
 
 # HÀM ĐỂ AI DI CHUYỂN
 def ai_move():
+    import cProfile
+    import pstats  # Import ở đây, hoặc đầu file nếu thích
+
+    profiler = cProfile.Profile() # Tạo profiler
+    profiler.enable() # Bắt đầu profiler
+
     move = opening_book.get_move(board)
     if move is None:  # Nếu không tìm thấy nước đi trong sách khai cuộc, sử dụng thuật toán tìm kiếm
-        move = get_best_move(board, depth=2)
+        move = get_best_move(board, depth=3)
     if move is not None:  # Check if move is not None
         board.push(move)
     else:
         print("AI returned None for move. No move pushed.")  # Optional: Log when AI returns None
+
+    profiler.disable() # Dừng profiler
+    stats = pstats.Stats(profiler).sort_stats('cumulative') # Lấy thống kê
+    stats.print_stats(20) # In thống kê ra terminal
