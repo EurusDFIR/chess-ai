@@ -1,0 +1,6 @@
+chess~=1.11.2
+numpy~=2.0.2
+pygame~=2.6.1
+pillow~=11.1.0
+setuptools~=75.8.0
+Cython~=3.0.12

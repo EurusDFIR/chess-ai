@@ -1,4 +1,4 @@
-#src/ai/opening_book.py
+#src/AI/opening_book.py
 import chess.polyglot
 
 class OpeningBook:
