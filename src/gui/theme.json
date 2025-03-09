@@ -1,0 +1,165 @@
+
+
+{
+    "colours":
+    {
+        "dark_shade": "#2B2B2B",
+        "light_shade": "#DCDDD9",
+        "window_background": "#C0C0C0",
+        "tool_bar_background": "#BABABA",
+        "text_colour": "#000000",
+        "button_text": "#000000",
+        "hovered_text": "#252525",
+        "selected_text": "#FFFFFF",
+        "text_shadow": "#FFFFFF",
+        "background_colour": "#F0F0F0",
+        "hover_colour": "#E5E5E5",
+        "selected_colour": "#DCDDD9",
+        "active_background_colour": "#FFFFFF"
+    },
+    "images":
+    {
+
+    },
+    "fonts":
+    {
+        "regular_font":
+        {
+            "name": "Arial",
+            "size": 14,
+            "bold": false,
+            "italic": false
+        },
+        "bold_font":
+        {
+            "name": "Arial",
+            "size": 14,
+            "bold": true,
+            "italic": false
+        },
+        "italic_font":
+        {
+            "name": "Arial",
+            "size": 14,
+            "bold": false,
+            "italic": true
+        },
+        "bold_italic_font":
+        {
+            "name": "Arial",
+            "size": 14,
+            "bold": true,
+            "italic": true
+        }
+    },
+    "styles":
+    {
+        "**":
+        {
+            "font": "regular_font",
+            "text_colour": "text_colour",
+            "background_colour": "background_colour",
+            "border_colour": "dark_shade",
+            "shadow_colour": "light_shade",
+            "text_shadow_colour": "text_shadow",
+            "padding": [5, 5],
+            "border_width": 1,
+            "shadow_width": 2,
+            "text_shadow_size": 1,
+            "border_corner_radius": 2
+        },
+        "UIButton":
+        {
+            "colours":
+            {
+                "normal_bg": "background_colour",
+                "hovered_bg": "hover_colour",
+                "disabled_bg": "light_shade",
+                "selected_bg": "selected_colour",
+                "active_bg": "active_background_colour",
+                "normal_text": "button_text",
+                "hovered_text": "hovered_text",
+                "selected_text": "selected_text",
+                "disabled_text": "text_colour"
+            },
+            "font": "bold_font",
+            "text_shadow": true,
+            "text_shadow_size": 1,
+            "text_shadow_offset": [1, 1],
+            "border_width": 1,
+            "border_corner_radius": 4
+        },
+        "@home_button":
+        {
+            "font":
+            {
+                "name": "Arial",
+                "size": 16,
+                "bold": true
+            },
+            "colours":
+            {
+                "normal_bg": "#4CAF50",
+                "hovered_bg": "#66BB6A",
+                "active_bg": "#388E3C",
+                "normal_text": "#FFFFFF",
+                "hovered_text": "#FFFFFF",
+                "active_text": "#FFFFFF"
+            },
+            "padding": [10, 10],
+            "border_corner_radius": 6
+        },
+        "@back_button":
+        {
+            "font":
+            {
+                "name": "Arial",
+                "size": 14,
+                "bold": false
+            },
+            "colours":
+            {
+                "normal_bg": "#f44336",
+                "hovered_bg": "#e57373",
+                "active_bg": "#d32f2f",
+                "normal_text": "#FFFFFF",
+                "hovered_text": "#FFFFFF",
+                "active_text": "#FFFFFF"
+            },
+            "padding": [8, 8],
+            "border_corner_radius": 4
+        },
+        "@home_title":
+        {
+            "font":
+            {
+                "name": "Arial",
+                "size": 40,
+                "bold": true
+            },
+            "text_colour": "#333333",
+            "shadow_size": 2,
+            "shadow_offset": [2, 2],
+            "shadow_colour": "#AAAAAA"
+        },
+        "@clock_label":
+        {
+            "font":
+            {
+                "name": "Arial",
+                "size": 24,
+                "bold": true
+            },
+            "colours":
+            {
+                "normal_bg": "#F0F0F0",
+                "normal_text": "#000000"
+            },
+            "text_alignment": "center",
+            "padding": [5, 5],
+            "border_corner_radius": 4,
+            "border_width": 1,
+            "border_colour": "#BABABA"
+        }
+    }
+}
