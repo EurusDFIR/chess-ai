@@ -11,3 +11,6 @@ Sau nước thứ 4: Tốc độ chậm lại trễ 4s
 ![img_1.png](img_1.png)
 
 cumtime: 4.761 
+
+modular architecture design
+![img_2.png](img_2.png)
