@@ -33,18 +33,80 @@ def load_pieces():
     return pieces
 
 def run_gui():
+
+
     pygame.init()
+    pygame.mixer.init()  # Khởi tạo mixer để chơi nhạc
     pygame.display.set_caption("Eury engine v1")
     WIDTH, HEIGHT = 800, 600
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
+
+    # **ĐOẠN CODE TEST ÂM THANH ĐƯỢC CHÈN VÀO ĐÂY**
+    print("--- ÂM THANH TEST BẮT ĐẦU ---")  # Thêm dòng này để dễ nhận biết output test
+    music_path_test = os.path.join(os.path.dirname(__file__), "..", "gui", "assets", "music", "background_music.mp3")
+    music_path_test = os.path.normpath(music_path_test)
+
+    if not os.path.exists(music_path_test):
+        print(f"Lỗi TEST: File nhạc không tìm thấy tại '{music_path_test}'. Vui lòng kiểm tra đường dẫn.")
+    else:
+        try:
+            pygame.mixer.music.load(music_path_test)
+            pygame.mixer.music.play(-1)  # Phát nhạc lặp lại
+            pygame.mixer.music.set_volume(1.0)
+            print("TEST THÀNH CÔNG: Đang phát nhạc...")
+        except pygame.error as e:
+            print(f"Lỗi TEST khi tải file nhạc: {e}")
+    print("--- ÂM THANH TEST KẾT THÚC ---")  # Thêm dòng này để dễ nhận biết output test
+    # **KẾT THÚC ĐOẠN CODE TEST ÂM THANH**
+
+
+
+    # Load font for coordinates
+    font = pygame.font.Font(None, 24)
+
+    # Load background image
+    bg_path = os.path.join(os.path.dirname(__file__), "assets", "backgrounds",
+                           "background.png")  # Đường dẫn đến ảnh nền, bạn có thể thay đổi
+    try:
+        background_image = pygame.image.load(bg_path).convert()  # .convert() để tối ưu hiển thị
+        background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
+    except pygame.error as e:
+        print(f"Error loading background image from path {bg_path}: {e}")
+        background_image = None  # Xử lý trường hợp không tải được ảnh
+
+    # Load background image for home screen
+    home_bg_path = os.path.join(os.path.dirname(__file__), "assets", "backgrounds",
+                                "home_background.png")  # Đường dẫn ảnh nền Home, bạn có thể thay đổi
+    try:
+        home_background_image = pygame.image.load(home_bg_path).convert()
+        home_background_image = pygame.transform.scale(home_background_image, (WIDTH, HEIGHT))
+    except pygame.error as e:
+        print(f"Error loading home background image from path {home_bg_path}: {e}")
+        home_background_image = None
+
+        # Load background music
+        music_path = os.path.join(os.path.dirname(__file__), "assets", "music",
+                                  "background_music.mp3")  # Đường dẫn đến file nhạc, bạn có thể thay đổi
+        if os.path.exists(music_path):
+            pygame.mixer.music.load(music_path)
+        else:
+            print("Music file not found at:", music_path)
+        try:
+            pygame.mixer.music.load(music_path)
+            print("Music loaded successfully.")
+        except pygame.error as e:
+            print(f"Error loading music from path {music_path}: {e}")
+        pygame.mixer.music.set_volume(1.0)
+        pygame.mixer.music.play(-1)  # Play in a loop
+
     clock = pygame.time.Clock()
     theme_path = os.path.join(os.path.dirname(__file__), 'theme.json')
     manager = pygame_gui.UIManager((WIDTH, HEIGHT), theme_path)  # Load theme file
 
     HOME_BG_COLOR = (220, 220, 220) # Màu nền trang chủ
-    LIGHT = (235, 235, 208)
-    DARK = (119, 149, 86)
-    HIGHLIGHT = (186, 202, 68)
+    LIGHT = (220, 230, 240)  # Xanh lam rất nhạt
+    DARK = (150, 170, 190)  # Xanh lam xám
+    HIGHLIGHT = (180, 210, 230)  # Xanh lam nhạt hơn
     ARROW_COLOR = (0, 180, 0)
     CLOCK_FONT_COLOR = (0, 0, 0)
     CLOCK_BG_COLOR = (240, 240, 240)
@@ -192,7 +254,6 @@ def run_gui():
             elif event.type == pygame.USEREVENT:
                 if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
                     if event.ui_element == play_button:
-                        print("Nút Play đã được nhấn!")
                         current_screen = "game"
                         init_game_time()
                         # Hide home screen buttons when switching to game
@@ -259,9 +320,13 @@ def run_gui():
 
         screen.fill(HOME_BG_COLOR)
         if current_screen == "home":
-            manager.draw_ui(screen)
+            if home_background_image:  # Vẽ ảnh nền Home nếu đã tải thành công
+                screen.blit(home_background_image, (0, 0))
+            else:  # Nếu không có ảnh nền Home, vẫn tô màu nền mặc định như cũ
+                screen.fill(HOME_BG_COLOR)
+            manager.draw_ui(screen)  # Vẽ UI Manager lên trên ảnh nền (hoặc màu nền)
         elif current_screen == "game":
-            draw_board(screen, board, piece_images, LIGHT, DARK, HIGHLIGHT, dragging_piece, dragging_start_pos, legal_moves, ARROW_COLOR, drawn_arrows, arrow_start_square, arrow_end_square, drawing_arrow, highlighted_squares)
+            draw_board(screen, board, piece_images, LIGHT, DARK, HIGHLIGHT, dragging_piece, dragging_start_pos, legal_moves, ARROW_COLOR, drawn_arrows, arrow_start_square, arrow_end_square, drawing_arrow, highlighted_squares, background_image,font)
             draw_pieces(screen, board, piece_images, dragging_piece, dragging_start_pos)
             manager.draw_ui(screen)
         elif current_screen == "settings":
@@ -279,7 +344,34 @@ def run_gui():
     pygame.quit()
 
 # Draw chess board
-def draw_board(screen, board, piece_images, LIGHT, DARK, HIGHLIGHT, dragging_piece, dragging_start_pos, legal_moves, ARROW_COLOR, drawn_arrows, arrow_start_square, arrow_end_square, drawing_arrow, highlighted_squares):
+def draw_board(screen, board, piece_images, LIGHT, DARK, HIGHLIGHT, dragging_piece, dragging_start_pos, legal_moves, ARROW_COLOR, drawn_arrows, arrow_start_square, arrow_end_square, drawing_arrow, highlighted_squares, background_image,font): # Thêm background_image vào đây
+    if background_image:
+        screen.blit(background_image, (0, 0))
+
+        # Vẽ tọa độ chữ cái (a-h) dưới bàn cờ
+        font_color = (0, 0, 0)  # Màu chữ tọa độ (đen)
+        letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+        for i, letter in enumerate(letters):
+            text_surface = font.render(letter, True, font_color)
+            text_rect = text_surface.get_rect(
+                center=((i * 64) + 32, 8 * 64 - 15))  # X: center ô, Y: dưới hàng 8, lùi lên 1 chút
+            screen.blit(text_surface, text_rect)
+
+        # Vẽ tọa độ số (1-8) bên trái bàn cờ
+        numbers = ['8', '7', '6', '5', '4', '3', '2', '1']  # Đảo ngược thứ tự để '8' ở trên cùng
+        for i, number in enumerate(numbers):
+            text_surface = font.render(number, True, font_color)
+            text_rect = text_surface.get_rect(center=(-15, (i * 64) + 32))  # X: lùi về bên trái, Y: center ô
+            screen.blit(text_surface, text_rect)
+
+        # Vẽ viền bàn cờ (màu xanh đậm, ví dụ)
+        BORDER_COLOR = (70, 130, 180)  # SteelBlue
+        BORDER_WIDTH = 10
+        BOARD_RECT = pygame.Rect(0, 0, 8 * 64 + 2 * BORDER_WIDTH,
+                                 8 * 64 + 2 * BORDER_WIDTH)  # Rect bao quanh bàn cờ và viền
+        BOARD_RECT.center = (4 * 64, 4 * 64)  # Canh giữa viền
+        pygame.draw.rect(screen, BORDER_COLOR, BOARD_RECT, border_radius=5)  # Vẽ viền hình chữ nhật bo tròn góc
+
     for row in range(8):
         for col in range(8):
             color = LIGHT if (row + col) % 2 == 0 else DARK
@@ -308,6 +400,7 @@ def draw_board(screen, board, piece_images, LIGHT, DARK, HIGHLIGHT, dragging_pie
         start_pos = get_square_center(arrow_start_square)
         end_pos = arrow_end_square
         draw_arrow(screen, ARROW_COLOR, start_pos, end_pos)
+
 
 def draw_arrow(screen, color, start_pos, end_pos):
     pygame.draw.line(screen, color, start_pos, end_pos, 5)

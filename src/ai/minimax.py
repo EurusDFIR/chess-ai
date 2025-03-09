@@ -7,6 +7,7 @@ import time
 import random
 import math
 import numpy as np
+from numba import jit
 
 # Initialize Zobrist Hash table
 zobrist_table = {}
