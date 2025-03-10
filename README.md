@@ -1,4 +1,5 @@
 # chess-ai
+
 Home UI
 ![img_3.png](img_3.png)
 
@@ -22,3 +23,23 @@ cumtime: 4.761
 modular architecture design
 
 ![img_2.png](img_2.png)
+
+all step to run thís engine
+
+step1: Clone the Repository: Open the terminal and run
+
+**git clone https://github.com/Eurus-Infosec/chess-ai.git**
+
+step2: Navigate to the Repository Directory:
+
+**cd chess-ai**
+
+step3: Install Dependencies: Ensure that Python and pip are installed, then run:
+```python
+# pip install -r requirements.txt
+```
+
+step4: Run the Application: Execute the main script. For example:
+```python
+# python main.py
+```

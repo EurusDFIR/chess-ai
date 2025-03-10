@@ -52,7 +52,7 @@ def run_gui():
         try:
             pygame.mixer.music.load(music_path_test)
             pygame.mixer.music.play(-1)  # Phát nhạc lặp lại
-            pygame.mixer.music.set_volume(1.0)
+            pygame.mixer.music.set_volume(0.7)
             print("TEST THÀNH CÔNG: Đang phát nhạc...")
         except pygame.error as e:
             print(f"Lỗi TEST khi tải file nhạc: {e}")
