@@ -89,18 +89,18 @@ def ai_move_threaded(board_copy, depth=4, time_limit=5.0):
                 try:
                     move = opening_book.get_move(board_copy)
                     if move:
-                        print(f"📖 Opening book: {move}")
+                        print(f"[Opening] Book move: {move}")
                 except:
                     pass
             
             # If no book move, use engine
             if not move:
                 move = get_best_move(board_copy, depth=depth, time_limit=time_limit)
-                print(f"🤖 AI calculated: {move}")
+                print(f"[AI] Calculated move: {move}")
             
             ai_move_queue.put(move)
         except Exception as e:
-            print(f"❌ AI error: {e}")
+            print(f"[Error] AI error: {e}")
             ai_move_queue.put(None)
     
     thread = threading.Thread(target=run_ai, daemon=True)
@@ -340,7 +340,7 @@ class ChessGame:
         self.chess_clock.show()
         self.control_panel.show_playing()
         
-        print(f"🎮 Game started: {self.selected_time_control}, AI: {self.selected_ai_level}")
+        print(f"[Game] Started: {self.selected_time_control}, AI: {self.selected_ai_level}")
     
     def make_ai_move(self):
         """Trigger AI to make a move"""

@@ -44,10 +44,10 @@ class CapturedPiecesWidget:
             # Có quân ở ô đích = capture move
             if captured_piece.color == chess.WHITE:
                 self.captured_white.append(captured_piece.symbol().upper())
-                print(f"⚪ Captured white {captured_piece.symbol()}")
+                print(f"[Capture] White {captured_piece.symbol()}")
             else:
                 self.captured_black.append(captured_piece.symbol().upper())
-                print(f"⚫ Captured black {captured_piece.symbol()}")
+                print(f"[Capture] Black {captured_piece.symbol()}")
     
     def draw(self):
         """Vẽ captured pieces - Lichess style"""
