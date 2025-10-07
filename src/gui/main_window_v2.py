@@ -319,6 +319,16 @@ class ChessGame:
             manager=self.manager
         )
         self.ai_level_dropdown.hide()
+        
+        # Volume slider
+        self.music_volume = 0.3  # Default volume
+        self.volume_slider = pygame_gui.elements.UIHorizontalSlider(
+            relative_rect=pygame.Rect((WINDOW_WIDTH//2 - 150, 420), (300, 30)),
+            start_value=self.music_volume,
+            value_range=(0.0, 1.0),
+            manager=self.manager
+        )
+        self.volume_slider.hide()
     
     def _load_music(self):
         """Load background music"""
@@ -367,8 +377,8 @@ class ChessGame:
         if not self.game_active or ai_thinking:
             return
         
-        # Pause clock while AI thinks
-        self.chess_clock.pause()
+        # Don't pause clock - AI should think on its own time
+        # Clock will continue running for AI (BLACK)
         
         # Get AI settings
         depth, time_limit = self.ai_levels[self.selected_ai_level]
@@ -483,9 +493,6 @@ class ChessGame:
                 # Update analysis if in analysis mode
                 if self.analysis_mode:
                     self._analyze_current_position()
-            
-            # Resume clock
-            self.chess_clock.resume()
         
         # Update UI manager
         self.manager.update(time_delta)
@@ -558,7 +565,7 @@ class ChessGame:
         # Content
         font_medium = pygame.font.Font(None, 32)
         font_small = pygame.font.Font(None, 28)
-        y = 180
+        y = 160
         
         # Time Control Label
         label = font_medium.render("Time Control:", True, TEXT_COLOR)
@@ -570,20 +577,28 @@ class ChessGame:
         self.screen.blit(label, (WINDOW_WIDTH//2 - 150, y))
         y += 120
         
+        # Music Volume Label
+        label = font_medium.render("Music Volume:", True, TEXT_COLOR)
+        self.screen.blit(label, (WINDOW_WIDTH//2 - 150, y))
+        volume_text = font_small.render(f"{int(self.music_volume * 100)}%", True, (150, 200, 255))
+        self.screen.blit(volume_text, (WINDOW_WIDTH//2 + 170, y + 5))
+        y += 90
+        
         # Instructions
         texts = [
             "",
-            "Controls:",
-            "  - Click and drag pieces to move",
-            "  - Right-click to draw arrows",
-            "  - Analysis mode available during game"
+            "Game Controls:",
+            "  • Click and drag to move pieces",
+            "  • Right-click drag to draw arrows",
+            "  • Analysis mode shows best moves",
+            "  • Time controls include increment"
         ]
         
         for text in texts:
             if text:
-                surface = font_small.render(text, True, (200, 200, 200))
+                surface = font_small.render(text, True, (180, 180, 180))
                 self.screen.blit(surface, (100, y))
-            y += 35
+            y += 32
     
     def _draw_about(self):
         """Draw about screen"""
@@ -592,36 +607,63 @@ class ChessGame:
         
         # Title
         font_large = pygame.font.Font(None, 64)
+        font_title = pygame.font.Font(None, 48)
         title = font_large.render("About", True, TEXT_COLOR)
-        self.screen.blit(title, (WINDOW_WIDTH//2 - title.get_width()//2, 80))
+        self.screen.blit(title, (WINDOW_WIDTH//2 - title.get_width()//2, 60))
         
-        # Content
-        font_medium = pygame.font.Font(None, 28)
-        y = 180
+        # Version and subtitle
+        font_medium = pygame.font.Font(None, 32)
+        font_small = pygame.font.Font(None, 26)
+        y = 140
         
-        texts = [
-            "Chess AI - Eury Engine v2.0",
-            "",
-            "Hybrid Architecture:",
-            "  Python GUI (Pygame)",
-            "  C++ Engine (Performance)",
-            "",
-            "Features:",
-            "  - Full chess rules",
-            "  - AI with 4 difficulty levels",
-            "  - Opening book support",
-            "  - Time controls with increment",
-            "  - Move history & analysis",
-            "",
-            "Author: Eurus-Infosec",
-            "License: MIT"
+        subtitle = font_title.render("♔ Chess AI - Eury Engine ♚", True, (150, 200, 255))
+        self.screen.blit(subtitle, (WINDOW_WIDTH//2 - subtitle.get_width()//2, y))
+        y += 60
+        
+        version = font_medium.render("Version 2.2.0", True, (180, 180, 180))
+        self.screen.blit(version, (WINDOW_WIDTH//2 - version.get_width()//2, y))
+        y += 60
+        
+        # Architecture section
+        section_title = font_medium.render("⚙ Architecture:", True, (255, 200, 100))
+        self.screen.blit(section_title, (100, y))
+        y += 45
+        
+        arch_texts = [
+            "  • Python GUI with Pygame CE",
+            "  • C++ Minimax Engine (Alpha-Beta Pruning)",
+            "  • Polyglot Opening Books (12 databases)",
+            "  • Syzygy Endgame Tablebases"
         ]
-        
-        for text in texts:
-            if text:
-                surface = font_medium.render(text, True, TEXT_COLOR)
-                self.screen.blit(surface, (100, y))
+        for text in arch_texts:
+            surface = font_small.render(text, True, (180, 180, 180))
+            self.screen.blit(surface, (100, y))
             y += 35
+        
+        y += 15
+        
+        # Features section
+        section_title = font_medium.render("✨ Features:", True, (100, 255, 150))
+        self.screen.blit(section_title, (100, y))
+        y += 45
+        
+        feature_texts = [
+            "  • Full chess rules with en passant & castling",
+            "  • 4 AI difficulty levels (Easy to Expert)",
+            "  • 7 time controls (Bullet to Classical)",
+            "  • Real-time position analysis",
+            "  • Move history & captured pieces",
+            "  • Interactive board with drag & drop"
+        ]
+        for text in feature_texts:
+            surface = font_small.render(text, True, (180, 180, 180))
+            self.screen.blit(surface, (100, y))
+            y += 35
+        
+        # Footer
+        y = WINDOW_HEIGHT - 80
+        author = font_small.render("Developed by: Eurus-Infosec | License: MIT", True, (150, 150, 150))
+        self.screen.blit(author, (WINDOW_WIDTH//2 - author.get_width()//2, y))
     
     def handle_event(self, event):
         """Handle pygame events"""
@@ -640,6 +682,12 @@ class ChessGame:
             elif event.ui_element == self.ai_level_dropdown:
                 self.selected_ai_level = event.text
                 print(f"[Settings] AI level changed to: {event.text}")
+        
+        # Volume slider changed
+        if event.type == pygame_gui.UI_HORIZONTAL_SLIDER_MOVED:
+            if event.ui_element == self.volume_slider:
+                self.music_volume = event.value
+                pygame.mixer.music.set_volume(self.music_volume)
         
         # Analysis panel events
         if self.analysis_mode and self.analysis_panel.handle_event(event):
@@ -716,6 +764,7 @@ class ChessGame:
             self.settings_back_button.show()
             self.time_control_dropdown.show()
             self.ai_level_dropdown.show()
+            self.volume_slider.show()
         
         elif button == self.about_button:
             self.current_screen = "about"
@@ -728,6 +777,7 @@ class ChessGame:
             self.settings_back_button.hide()
             self.time_control_dropdown.hide()
             self.ai_level_dropdown.hide()
+            self.volume_slider.hide()
             for btn in self.home_buttons:
                 btn.show()
         

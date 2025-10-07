@@ -111,3 +111,7 @@ class MoveHistoryWidget:
     def show(self):
         """Show the widget"""
         self.visible = True
+    
+    def clear(self):
+        """Clear the move history (reset scroll)"""
+        self.scroll_offset = 0

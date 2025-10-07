@@ -17,10 +17,16 @@
   - Classical 30+0 (30 phút)
 
 - ✅ **AI Difficulty Selector**: Chọn độ khó AI từ dropdown menu
+
   - Easy (depth 2, 1 giây)
   - Medium (depth 3, 3 giây)
   - **Hard** (depth 4, 5 giây - mặc định)
   - Expert (depth 5, 10 giây)
+
+- ✅ **Music Volume Control**: Slider điều chỉnh âm lượng nhạc nền
+  - Phạm vi: 0% - 100%
+  - Mặc định: 30%
+  - Hiển thị real-time volume percentage
 
 #### 2. **Bàn cờ mới - Chess.com Theme**
 
@@ -30,22 +36,49 @@
   - Highlight: Xanh vàng trong suốt
   - Last move: Vàng xanh trong suốt
 
-#### 3. **Kiểm soát thời gian AI động**
+#### 3. **Kiểm soát thời gian cải thiện**
 
 - ✅ AI giờ đây tuân theo settings được chọn
 - ✅ Thay đổi độ khó AI trong settings sẽ áp dụng cho game tiếp theo
 - ✅ Thay đổi time control sẽ áp dụng đồng hồ đếm ngược mới
+- ✅ **QUAN TRỌNG**: Đồng hồ AI giờ đây chạy đúng - không bị đứng yên
+
+#### 4. **About & Settings Screen cải tiến**
+
+- ✅ About screen với layout đẹp hơn, có icons
+
+  - Phân chia rõ ràng: Architecture, Features
+  - Version number và subtitle
+  - Color coding cho từng section
+  - Footer với author info
+
+- ✅ Settings screen với instructions
+  - Volume slider với percentage display
+  - Game controls guide
+  - Organized layout
 
 ### 🐛 Sửa lỗi
 
-#### 1. **Warnings đã được loại bỏ**
+#### 1. **Đồng hồ AI bị đứng yên - ĐÃ SỬA**
+
+**Vấn đề**: Khi AI suy nghĩ, đồng hồ của AI bị pause, chỉ đồng hồ người chơi chạy.
+
+**Nguyên nhân**: Code gọi `chess_clock.pause()` khi AI bắt đầu suy nghĩ, sau đó `resume()` khi xong. Điều này pause CẢ HAI đồng hồ.
+
+**Giải pháp**:
+
+- Xóa `chess_clock.pause()` trong `make_ai_move()`
+- Xóa `chess_clock.resume()` sau khi AI xong
+- Đồng hồ giờ chạy liên tục cho cả hai bên
+
+#### 2. **Warnings đã được loại bỏ**
 
 - ✅ Syzygy tablebase warning (im lặng nếu không tìm thấy)
 - ✅ DeprecationWarning về `event.user_type` → `event.type`
 - ✅ Font warnings trong pygame_gui (đổi từ fira_code → consolas)
 - ✅ Unicode emoji errors trên Windows (đổi sang text prefix)
 
-#### 2. **Print statements clean hơn**
+#### 3. **Print statements clean hơn**
 
 - `🎵` → `[Music]`
 - `🎮` → `[Game]`
