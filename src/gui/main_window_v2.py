@@ -219,8 +219,9 @@ class ChessGame:
         )
         
         # Analysis panel (hidden by default, shown when analysis button clicked)
+        # Smaller height to not overlap control buttons
         self.analysis_panel = AnalysisPanel(
-            pygame.Rect(sidebar_x, 100, sidebar_width, 350),
+            pygame.Rect(sidebar_x, 100, sidebar_width, 280),
             self.manager,
             self.board
         )
@@ -419,13 +420,13 @@ class ChessGame:
         font = pygame.font.Font(None, 48)
         
         result_texts = {
-            'checkmate_white': '♔ White Wins!',
-            'checkmate_black': '♚ Black Wins!',
-            'stalemate': '🤝 Draw - Stalemate',
-            'insufficient_material': '🤝 Draw',
-            'white_timeout': '⏰ Black Wins (Time)',
-            'black_timeout': '⏰ White Wins (Time)',
-            'draw': '🤝 Draw Agreed',
+            'checkmate_white': 'White Wins!',
+            'checkmate_black': 'Black Wins!',
+            'stalemate': 'Draw - Stalemate',
+            'insufficient_material': 'Draw - Insufficient Material',
+            'white_timeout': 'Black Wins (Timeout)',
+            'black_timeout': 'White Wins (Timeout)',
+            'draw': 'Draw Agreed',
         }
         
         result_text = result_texts.get(self.game_result, 'Game Over')
@@ -720,10 +721,20 @@ class ChessGame:
         if not self.game_active:
             return
         
+        # Sync board state with panel
+        self.analysis_panel.set_board(self.board)
+        
         def analyze_callback(result):
             """Callback when analysis completes"""
             self.analysis_panel.update_analysis(result)
-            self.evaluation_bar.set_evaluation(result.evaluation)
+            
+            # Convert evaluation to centipawn (divide by 100) from white's perspective
+            # result.evaluation is from side-to-move perspective
+            eval_cp = result.evaluation / 100.0
+            if self.board.turn == chess.BLACK:
+                eval_cp = -eval_cp  # Flip for white perspective
+            
+            self.evaluation_bar.set_evaluation(eval_cp)
         
         # Run analysis in background
         self.analysis_engine.start_background_analysis(

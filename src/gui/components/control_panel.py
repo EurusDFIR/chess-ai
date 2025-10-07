@@ -1,5 +1,5 @@
 """
-Control Panel - Nút điều khiển game
+Control Panel - Lichess-style icon buttons
 """
 import pygame
 import pygame_gui
@@ -7,7 +7,7 @@ from pygame_gui.core import ObjectID
 
 
 class ControlPanel:
-    """Panel chứa các nút điều khiển game"""
+    """Panel chứa các nút điều khiển - Lichess style"""
     
     def __init__(self, manager, screen_width=800):
         self.manager = manager
@@ -23,55 +23,61 @@ class ControlPanel:
         self._create_buttons()
     
     def _create_buttons(self):
-        """Tạo các nút điều khiển"""
-        button_width = 110
-        button_height = 38
+        """Tạo các nút điều khiển - Icon-based như Lichess"""
+        # Smaller, more compact buttons
+        button_width = 45
+        button_height = 45
         button_x = self.width - button_width - 20
-        spacing = 45
-        start_y = 150
+        spacing = 8
+        start_y = 390
         
-        # Resign button
+        # Resign button - Flag icon
         self.resign_button = pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect((button_x, start_y), (button_width, button_height)),
-            text='Resign',
+            text='⚑',  # Flag icon
             manager=self.manager,
-            object_id=ObjectID(class_id='@danger_button')
+            object_id=ObjectID(class_id='@icon_button_danger'),
+            tool_tip_text='Resign'
         )
         
-        # Draw button
+        # Draw button - 1/2 symbol
         self.draw_button = pygame_gui.elements.UIButton(
-            relative_rect=pygame.Rect((button_x, start_y + spacing), 
+            relative_rect=pygame.Rect((button_x, start_y + (button_height + spacing)), 
                                      (button_width, button_height)),
-            text='Draw',
+            text='½',  # Half symbol
             manager=self.manager,
-            object_id=ObjectID(class_id='@secondary_button')
+            object_id=ObjectID(class_id='@icon_button'),
+            tool_tip_text='Offer Draw'
         )
         
-        # Analysis button
+        # Analysis button - Magnifying glass
         self.analysis_button = pygame_gui.elements.UIButton(
-            relative_rect=pygame.Rect((button_x, start_y + spacing * 2), 
+            relative_rect=pygame.Rect((button_x, start_y + (button_height + spacing) * 2), 
                                      (button_width, button_height)),
-            text='Analysis',
+            text='⚙',  # Settings/analysis icon
             manager=self.manager,
-            object_id=ObjectID(class_id='@info_button')
+            object_id=ObjectID(class_id='@icon_button_info'),
+            tool_tip_text='Toggle Analysis'
         )
         
         # Rematch button (hidden initially)
         self.rematch_button = pygame_gui.elements.UIButton(
-            relative_rect=pygame.Rect((button_x, start_y + spacing * 3), 
+            relative_rect=pygame.Rect((button_x, start_y + (button_height + spacing) * 3), 
                                      (button_width, button_height)),
-            text='Rematch',
+            text='↻',  # Refresh icon
             manager=self.manager,
-            object_id=ObjectID(class_id='@success_button')
+            object_id=ObjectID(class_id='@icon_button_success'),
+            tool_tip_text='Rematch'
         )
         
         # Home button
         self.home_button = pygame_gui.elements.UIButton(
-            relative_rect=pygame.Rect((button_x, start_y + spacing * 4), 
+            relative_rect=pygame.Rect((button_x, start_y + (button_height + spacing) * 4), 
                                      (button_width, button_height)),
-            text='Home',
+            text='⌂',  # Home icon
             manager=self.manager,
-            object_id=ObjectID(class_id='@secondary_button')
+            object_id=ObjectID(class_id='@icon_button'),
+            tool_tip_text='Return Home'
         )
         
         self.hide_all()

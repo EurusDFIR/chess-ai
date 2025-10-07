@@ -6,7 +6,7 @@ Shows best moves, evaluation, and move quality annotations
 
 import pygame
 import pygame_gui
-from pygame_gui.elements import UIPanel, UILabel, UIButton, UITextBox
+from pygame_gui.elements import UIPanel, UILabel, UIButton
 from typing import Optional, List, Tuple
 import chess
 
@@ -50,6 +50,10 @@ class AnalysisPanel:
         
         # UI Elements
         self._create_ui()
+    
+    def set_board(self, board: chess.Board):
+        """Update the board reference for move conversions"""
+        self.board = board
         
     def _create_ui(self):
         """Create UI elements"""
@@ -93,15 +97,15 @@ class AnalysisPanel:
         )
         y_pos += 30
         
-        # Analysis details (text box)
-        self.details_box = UITextBox(
-            html_text='<font size=3>Position analysis will appear here...</font>',
+        # Analysis details (plain label instead of text box to avoid scrollbar bug)
+        self.details_label = UILabel(
             relative_rect=pygame.Rect(
                 padding,
                 y_pos,
                 self.rect.width - 2*padding,
                 self.rect.height - y_pos - 60
             ),
+            text='Position analysis will appear here...',
             manager=self.manager,
             container=self.panel
         )
@@ -146,7 +150,7 @@ class AnalysisPanel:
         self.quality_label.set_text('')
         
         # Update details
-        self._update_details_box()
+        self._update_details_label()
     
     def update_move_analysis(self, move_analysis: MoveAnalysis):
         """
@@ -174,66 +178,68 @@ class AnalysisPanel:
         self.quality_label.set_text(quality_text)
         
         # Update details
-        self._update_details_box()
+        self._update_details_label()
     
-    def _update_details_box(self):
-        """Update the details text box with analysis information"""
-        html_parts = []
-        html_parts.append('<font size=3>')
+    def _update_details_label(self):
+        """Update the details label with analysis information"""
+        text_parts = []
         
         if self.move_analysis:
             # Showing move analysis
             ma = self.move_analysis
             
-            html_parts.append(f'<b>Move:</b> {self._move_to_san(ma.move, ma.position_before)}<br>')
-            html_parts.append(f'<b>Quality:</b> {ma.quality.value} {ma.comment}<br>')
-            html_parts.append(f'<b>Eval change:</b> {self._format_evaluation(ma.eval_before)} → {self._format_evaluation(ma.eval_after)}<br>')
+            text_parts.append(f'Move: {self._move_to_san(ma.move, ma.position_before)}')
+            text_parts.append(f'Quality: {ma.quality.value} {ma.comment}')
+            text_parts.append(f'Eval: {self._format_evaluation(ma.eval_before)} -> {self._format_evaluation(ma.eval_after)}')
             
             if ma.eval_loss > 0:
-                html_parts.append(f'<b>Accuracy loss:</b> {ma.eval_loss:.0f} cp<br>')
+                text_parts.append(f'Loss: {ma.eval_loss:.0f} cp')
             
-            html_parts.append('<br><b>Alternative moves:</b><br>')
+            text_parts.append('')
+            text_parts.append('Alternatives:')
             
             if ma.alternatives:
-                for i, (move, eval_score) in enumerate(ma.alternatives[:5], 1):
+                for i, (move, eval_score) in enumerate(ma.alternatives[:3], 1):
                     move_san = self._move_to_san(move, ma.position_before)
                     eval_str = self._format_evaluation(eval_score)
-                    html_parts.append(f'{i}. {move_san} ({eval_str})<br>')
+                    text_parts.append(f'{i}. {move_san} ({eval_str})')
             else:
-                html_parts.append('No alternatives calculated<br>')
+                text_parts.append('None')
                 
         elif self.current_analysis:
             # Showing position analysis
             analysis = self.current_analysis
             
-            html_parts.append(f'<b>Depth:</b> {analysis.depth}<br>')
-            html_parts.append(f'<b>Time:</b> {analysis.time_ms}ms<br>')
+            text_parts.append(f'Depth: {analysis.depth}')
+            text_parts.append(f'Time: {analysis.time_ms}ms')
             
             if analysis.best_move:
-                html_parts.append(f'<b>Best move:</b> {self.board.san(analysis.best_move)}<br>')
+                text_parts.append(f'Best: {self.board.san(analysis.best_move)}')
             
-            html_parts.append('<br><b>Top moves:</b><br>')
+            text_parts.append('')
+            text_parts.append('Top moves:')
             
             if analysis.alternatives:
-                for i, (move, eval_score) in enumerate(analysis.alternatives, 1):
+                for i, (move, eval_score) in enumerate(analysis.alternatives[:3], 1):
                     move_san = self.board.san(move)
                     eval_str = self._format_evaluation(eval_score)
-                    html_parts.append(f'{i}. {move_san} ({eval_str})<br>')
+                    text_parts.append(f'{i}. {move_san} ({eval_str})')
             else:
-                html_parts.append('Calculating alternatives...<br>')
+                text_parts.append('Calculating...')
         else:
-            html_parts.append('No analysis data available<br>')
-            html_parts.append('<br>Click "Analyze Position" to start analysis.')
+            text_parts.append('No analysis data')
+            text_parts.append('')
+            text_parts.append('Click "Analyze Position"')
         
-        html_parts.append('</font>')
-        self.details_box.set_text(''.join(html_parts))
+        self.details_label.set_text('\n'.join(text_parts))
     
     def _format_evaluation(self, eval_cp: float) -> str:
-        """Format evaluation as string"""
+        """Format evaluation as string (eval_cp is in raw score, need to convert to pawns)"""
         if abs(eval_cp) > 9000:
             mate_in = int((10000 - abs(eval_cp)) / 100)
             return f"M{mate_in}" if eval_cp > 0 else f"-M{mate_in}"
         else:
+            # Convert centipawn (raw score) to pawn units
             return f"{eval_cp/100:+.2f}"
     
     def _format_move_quality(self, move_analysis: MoveAnalysis) -> str:
@@ -270,7 +276,7 @@ class AnalysisPanel:
         self.eval_label.set_text('Evaluation: 0.00')
         self.best_move_label.set_text('Best move: --')
         self.quality_label.set_text('')
-        self.details_box.set_text('<font size=3>No analysis data</font>')
+        self.details_label.set_text('No analysis data')
     
     def hide(self):
         """Hide the panel"""

@@ -1,12 +1,12 @@
 """
-Move History Widget - Hiển thị lịch sử nước đi
+Move History Widget - Lichess-style compact design
 """
 import pygame
 import chess
 
 
 class MoveHistoryWidget:
-    """Widget hiển thị lịch sử các nước đi"""
+    """Widget hiển thị lịch sử các nước đi - Lichess style"""
     
     def __init__(self, screen, x, y, width=180, height=300):
         self.screen = screen
@@ -15,69 +15,88 @@ class MoveHistoryWidget:
         self.width = width
         self.height = height
         
-        self.font = pygame.font.Font(None, 20)
-        self.title_font = pygame.font.Font(None, 22)
+        # Lichess-style fonts (smaller, cleaner)
+        try:
+            self.font = pygame.font.SysFont('Segoe UI', 13)
+            self.move_num_font = pygame.font.SysFont('Segoe UI', 12)
+        except:
+            self.font = pygame.font.Font(None, 18)
+            self.move_num_font = pygame.font.Font(None, 17)
         
-        # Colors
-        self.bg_color = (40, 40, 40)
-        self.text_color = (220, 220, 220)
-        self.title_color = (180, 180, 180)
+        # Lichess-inspired colors
+        self.bg_color = (37, 36, 34)  # Dark brown
+        self.text_color = (189, 176, 153)  # Light tan
+        self.move_num_color = (128, 120, 105)  # Muted tan
+        self.highlight_color = (80, 70, 55)  # Subtle highlight
+        self.hover_color = (60, 55, 45)  # Hover effect
         
-        self.visible = True  # Add visibility flag
+        self.visible = True
+        self.scroll_offset = 0
     
     def draw(self, board):
-        """Vẽ move history"""
-        if not self.visible:  # Skip if hidden
+        """Vẽ move history - Lichess style"""
+        if not self.visible:
             return
             
-        # Vẽ background
+        # Background
         pygame.draw.rect(self.screen, self.bg_color, 
                         (self.x, self.y, self.width, self.height))
         
-        # Vẽ border
-        pygame.draw.rect(self.screen, (80, 80, 80), 
-                        (self.x, self.y, self.width, self.height), 2)
+        # No border - cleaner look
         
-        # Vẽ tiêu đề
-        title = self.title_font.render("Move History", True, self.title_color)
-        self.screen.blit(title, (self.x + 10, self.y + 10))
-        
-        # Vẽ moves
-        y_offset = 40
-        line_height = 25
-        
-        # Get moves from board
+        # Get moves
         moves = list(board.move_stack)
+        if not moves:
+            # Show placeholder text
+            text = self.font.render("No moves yet", True, self.move_num_color)
+            self.screen.blit(text, (self.x + 10, self.y + 10))
+            return
         
-        # Scroll to show last moves
-        max_visible = (self.height - 50) // line_height
+        # Lichess-style compact layout
+        y_offset = 8
+        line_height = 22
+        padding_left = 8
+        
+        # Column widths
+        num_width = 28  # "1."
+        move_width = (self.width - num_width - padding_left * 2) // 2
+        
+        # Calculate visible moves
+        max_visible = (self.height - y_offset * 2) // line_height
         start_idx = max(0, len(moves) - max_visible * 2)
         
-        # Group moves by pairs (white, black)
         move_number = start_idx // 2 + 1
+        current_y = self.y + y_offset
         
         for i in range(start_idx, len(moves), 2):
+            # Highlight last move pair
+            is_last = (i >= len(moves) - 2)
+            if is_last:
+                pygame.draw.rect(self.screen, self.highlight_color, 
+                               (self.x, current_y - 2, self.width, line_height))
+            
+            # Move number
+            num_text = self.move_num_font.render(f"{move_number}.", True, self.move_num_color)
+            self.screen.blit(num_text, (self.x + padding_left, current_y + 2))
+            
             # White move
             white_move = self._format_move(moves[i])
+            white_text = self.font.render(white_move, True, self.text_color)
+            self.screen.blit(white_text, (self.x + padding_left + num_width, current_y))
             
             # Black move (if exists)
-            black_move = ""
             if i + 1 < len(moves):
                 black_move = self._format_move(moves[i + 1])
+                black_text = self.font.render(black_move, True, self.text_color)
+                self.screen.blit(black_text, 
+                               (self.x + padding_left + num_width + move_width, current_y))
             
-            # Render move pair
-            move_text = f"{move_number}. {white_move}"
-            if black_move:
-                move_text += f"  {black_move}"
+            current_y += line_height
+            move_number += 1
             
-            text = self.font.render(move_text, True, self.text_color)
-            
-            # Highlight last move
-            if i >= len(moves) - 2:
-                pygame.draw.rect(self.screen, (60, 60, 80), 
-                               (self.x + 5, self.y + y_offset - 2, 
-                                self.width - 10, line_height))
-            
+            # Stop if out of bounds
+            if current_y > self.y + self.height - line_height:
+                break
             self.screen.blit(text, (self.x + 10, self.y + y_offset))
             
             y_offset += line_height

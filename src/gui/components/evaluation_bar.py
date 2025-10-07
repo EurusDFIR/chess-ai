@@ -33,7 +33,7 @@ class EvaluationBar:
         self.color_text = pygame.Color(255, 255, 255)
         
         # Current evaluation
-        self.evaluation = 0.0  # Centipawns (positive = white advantage)
+        self.evaluation = 0.0  # Pawn units (positive = white advantage)
         self._display_eval = 0.0  # Smoothed evaluation for animation
         
         # Fonts
@@ -47,8 +47,8 @@ class EvaluationBar:
         Set the evaluation score
         
         Args:
-            evaluation: Centipawn evaluation (positive = white advantage)
-                       Use large values (±10000) for mate positions
+            evaluation: Pawn evaluation (positive = white advantage)
+                       Use large values (±100) for mate positions
         """
         self.evaluation = evaluation
     
@@ -166,11 +166,11 @@ class EvaluationBar:
         Returns:
             String like "+1.5", "-0.3", "M5", etc.
         """
-        if abs(self.evaluation) > 9000:
-            mate_in = int((10000 - abs(self.evaluation)) / 100)
+        if abs(self.evaluation) > 90:
+            mate_in = int((100 - abs(self.evaluation)))
             return f"M{mate_in}" if self.evaluation > 0 else f"-M{mate_in}"
         else:
-            return f"{self.evaluation/100:+.2f}"
+            return f"{self.evaluation:+.2f}"
     
     def reset(self):
         """Reset evaluation to 0"""
