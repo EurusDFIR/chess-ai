@@ -1,0 +1,101 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS
+Thumbs.db
+Desktop.ini
+
+# C/C++ build artifacts
+*.pyd
+*.dll
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# Development files
+benchmark*.py
+demo_*.py
+test_*.py
+quick_test.py
+temp/
+tmp/
+*.tmp
+
+# Screenshots (keep in docs/images/)
+/*.png
+/*.jpg
+/*.gif
+
+# Logs
+*.log
+
+# Database
+*.db
+*.sqlite
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Distribution artifacts
+*.zip
+*.tar.gz
+*.rar
