@@ -501,7 +501,7 @@ class ChessGame:
         
         # Draw sidebar components (widgets handle their own visibility)
         self.captured_widget.draw()
-        self.move_history.draw_san(self.board)
+        self.move_history.draw(self.board)
         
         # Draw thinking indicator
         if ai_thinking:

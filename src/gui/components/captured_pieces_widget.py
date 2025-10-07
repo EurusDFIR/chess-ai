@@ -96,33 +96,6 @@ class CapturedPiecesWidget:
         if material_diff < 0:
             adv_text = self.font.render(f'+{abs(material_diff)}', True, self.advantage_color)
             self.screen.blit(adv_text, (x_pos + 5, y_pos))
-        self._draw_captured_side(self.captured_black, self.y + y_offset, 
-                                material_diff if material_diff > 0 else 0, 'w')
-        
-        y_offset += 50
-        
-        # Vẽ captured white pieces (black đã ăn)
-        self._draw_captured_side(self.captured_white, self.y + y_offset, 
-                                -material_diff if material_diff < 0 else 0, 'b')
-    
-    def _draw_captured_side(self, pieces, y, advantage, color_prefix):
-        """Vẽ quân bị ăn cho một bên"""
-        x_offset = 0
-        piece_size = 30
-        
-        for piece_symbol in pieces:
-            piece_key = f"{color_prefix}{piece_symbol.lower()}"
-            if piece_key in self.piece_images:
-                img = self.piece_images[piece_key]
-                # Scale down image
-                scaled_img = pygame.transform.scale(img, (piece_size, piece_size))
-                self.screen.blit(scaled_img, (self.x + x_offset, y))
-                x_offset += piece_size + 2
-        
-        # Hiển thị material advantage
-        if advantage > 0:
-            adv_text = self.font.render(f"+{int(advantage)}", True, (100, 255, 100))
-            self.screen.blit(adv_text, (self.x + x_offset + 10, y + 5))
     
     def reset(self):
         """Reset captured pieces"""
