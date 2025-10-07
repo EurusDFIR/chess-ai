@@ -13,12 +13,14 @@ class BoardWidget:
     SQUARE_SIZE = 64
     BOARD_SIZE = SQUARE_SIZE * 8
     
-    # Colors - Lichess Blue Theme
+    # Colors - Lichess Theme
     LIGHT_SQUARE = (240, 217, 181)  # Nâu sáng
     DARK_SQUARE = (181, 136, 99)    # Nâu đậm
     HIGHLIGHT = (255, 255, 102, 150)  # Vàng trong suốt
     LAST_MOVE = (155, 199, 0, 100)   # Xanh lá trong suốt
     ARROW_COLOR = (255, 170, 0)      # Cam
+    LEGAL_MOVE_DOT = (32, 127, 70, 180)  # Green dot for legal moves
+    LEGAL_MOVE_CIRCLE = (32, 127, 70, 120)  # Green circle for captures
     
     def __init__(self, screen, piece_images, x=0, y=0):
         self.screen = screen
@@ -149,22 +151,30 @@ class BoardWidget:
         ))
     
     def _draw_legal_move_indicator(self, square):
-        """Vẽ chấm tròn cho nước đi hợp lệ"""
+        """Vẽ chấm tròn cho nước đi hợp lệ - Lichess style"""
         row = 7 - (square // 8)
         col = square % 8
         
         center_x = self.x + col * self.SQUARE_SIZE + self.SQUARE_SIZE // 2
         center_y = self.y + row * self.SQUARE_SIZE + self.SQUARE_SIZE // 2
         
+        # Tạo surface trong suốt cho alpha blending
+        s = pygame.Surface((self.SQUARE_SIZE, self.SQUARE_SIZE), pygame.SRCALPHA)
+        
         # Kiểm tra xem có quân ở đó không (capture move)
         if self.board.piece_at(square):
-            # Vẽ viền tròn lớn hơn cho capture
-            pygame.draw.circle(self.screen, (200, 50, 50, 180), 
-                             (center_x, center_y), 28, 4)
+            # Vẽ viền tròn cho capture - green ring
+            pygame.draw.circle(s, self.LEGAL_MOVE_CIRCLE, 
+                             (self.SQUARE_SIZE // 2, self.SQUARE_SIZE // 2), 
+                             30, 6)
         else:
-            # Vẽ chấm tròn nhỏ cho move bình thường
-            pygame.draw.circle(self.screen, (50, 50, 50, 100), 
-                             (center_x, center_y), 10)
+            # Vẽ chấm tròn nhỏ cho move bình thường - green dot
+            pygame.draw.circle(s, self.LEGAL_MOVE_DOT, 
+                             (self.SQUARE_SIZE // 2, self.SQUARE_SIZE // 2), 
+                             8)
+        
+        self.screen.blit(s, (self.x + col * self.SQUARE_SIZE, 
+                            self.y + row * self.SQUARE_SIZE))
     
     def _draw_arrows(self):
         """Vẽ các mũi tên"""
