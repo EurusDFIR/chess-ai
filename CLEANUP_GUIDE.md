@@ -3,6 +3,7 @@
 ## Files/Folders to DELETE (Development artifacts):
 
 ### Root Level:
+
 - `benchmark_engines.py` - Testing only
 - `demo_*.py` (all demo files) - Examples only
 - `quick_test.py` - Testing only
@@ -15,17 +16,20 @@
 - `COMPLETION_SUMMARY.md` - Development log
 
 ### Docs folder (keep only essentials):
+
 **KEEP:**
+
 - `QUICK_START.md` - User guide
 - `GAME_CONTROLS_GUIDE.md` - How to play
 - `ANALYSIS_MODE_GUIDE.md` - Features
 - `TODO.md` - Roadmap
 
 **DELETE (Development docs):**
-- All BUILD_*.md files
-- All IMPLEMENTATION_*.md files
-- All FIX_*.md files
-- All GUI_*.md files
+
+- All BUILD\_\*.md files
+- All IMPLEMENTATION\_\*.md files
+- All FIX\_\*.md files
+- All GUI\_\*.md files
 - ARCHITECTURE_DIAGRAM.md
 - CPP_IMPLEMENTATION_GUIDE.md
 - DETAILED_ANALYSIS.md
@@ -123,6 +127,7 @@ htmlcov/
 ## Distribution Methods:
 
 ### 1. **GitHub Release (Recommended)**
+
 ```bash
 # Tag version
 git tag -a v2.1.0 -m "Release v2.1.0 - Lichess-style UI"
@@ -135,12 +140,14 @@ git push origin v2.1.0
 ```
 
 ### 2. **PyPI Package**
+
 ```bash
 python setup.py sdist bdist_wheel
 twine upload dist/*
 ```
 
 ### 3. **Executable Distribution**
+
 ```bash
 # Using PyInstaller
 pip install pyinstaller
@@ -150,6 +157,7 @@ pyinstaller --onefile --windowed src/gui/main_window_v2.py
 ```
 
 ### 4. **Docker Container**
+
 ```dockerfile
 FROM python:3.12-slim
 WORKDIR /app
@@ -161,24 +169,28 @@ CMD ["python", "-m", "src.gui.main_window_v2"]
 
 ## Installation Instructions (for users):
 
-```markdown
+````markdown
 # Quick Install
 
 ## Prerequisites
-- Python 3.10+ 
+
+- Python 3.10+
 - pip
 
 ## Installation
 
 ### Method 1: From Source
+
 ```bash
 git clone https://github.com/Eurus-Infosec/chess-ai.git
 cd chess-ai
 pip install -r requirements.txt
 python -m src.gui.main_window_v2
 ```
+````
 
 ### Method 2: Using setup.py
+
 ```bash
 git clone https://github.com/Eurus-Infosec/chess-ai.git
 cd chess-ai
@@ -187,7 +199,11 @@ chess-ai
 ```
 
 ### Method 3: Download Executable (Windows)
+
 1. Download `ChessAI-v2.1.0-windows.exe` from [Releases]
 2. Run the executable
 3. No installation needed!
+
+```
+
 ```

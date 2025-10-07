@@ -21,13 +21,22 @@ def build_executable():
         print("❌ PyInstaller not found. Installing...")
         subprocess.run([sys.executable, "-m", "pip", "install", "pyinstaller"])
     
+    # Check if icon exists
+    icon_path = PROJECT_ROOT / "src" / "gui" / "assets" / "icon.ico"
+    icon_arg = []
+    if icon_path.exists():
+        icon_arg = [f"--icon={icon_path}"]
+        print(f"✅ Using icon: {icon_path}")
+    else:
+        print("⚠️  No icon found, building without custom icon")
+    
     # PyInstaller command
     cmd = [
         "pyinstaller",
         "--name=ChessAI-EuryEngine",
         "--onefile",  # Single executable
         "--windowed",  # No console window (GUI only)
-        "--icon=src/gui/assets/icon.ico",  # Icon (if exists)
+        *icon_arg,  # Add icon if exists
         "--add-data=src/gui/assets:assets",  # Include assets
         "--add-data=src/gui/theme_improved.json:.",  # Include theme
         "--add-data=opening_bin:opening_bin",  # Include opening books
