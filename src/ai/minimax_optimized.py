@@ -120,9 +120,11 @@ class SearchInfo:
         self.tt = TranspositionTable(256)
         self.killer_moves = [[None, None] for _ in range(MAX_PLY)]
         self.history = defaultdict(int)
+        self.countermoves = {}  # Countermove heuristic
         self.pv_table = [[None] * MAX_PLY for _ in range(MAX_PLY)]
         self.pv_length = [0] * MAX_PLY
         self.stopped = False
+        self.last_move = None  # Track last move for countermove
     
     def check_time(self):
         """Check if we should stop search."""
@@ -137,6 +139,11 @@ class SearchInfo:
         for next_ply in range(ply + 1, self.pv_length[ply + 1]):
             self.pv_table[ply][next_ply] = self.pv_table[ply + 1][next_ply]
         self.pv_length[ply] = self.pv_length[ply + 1]
+    
+    def update_countermove(self, prev_move, current_move):
+        """Update countermove table."""
+        if prev_move:
+            self.countermoves[prev_move] = current_move
 
 
 # Piece values for SEE
@@ -151,7 +158,7 @@ PIECE_VALUES = {
 
 
 def see(board, move):
-    """Static Exchange Evaluation - evaluate if capture is winning."""
+    """Static Exchange Evaluation - more accurate implementation."""
     if not board.is_capture(move):
         return 0
     
@@ -165,25 +172,47 @@ def see(board, move):
     if not attacker or not victim:
         return 0
     
-    # Simple SEE: victim_value - attacker_value if piece is hanging
-    gain = PIECE_VALUES[victim.piece_type]
+    # Initial gain from capture
+    gain = [PIECE_VALUES[victim.piece_type]]
     
-    # Check if attacker is defended
+    # Simulate exchange
     board.push(move)
-    is_hanging = len(list(board.attackers(not attacker.color, to_square))) > 0
+    
+    # Get all attackers to the target square
+    defending_side = not attacker.color
+    attackers = list(board.attackers(defending_side, to_square))
+    
+    if not attackers:
+        # No defenders, capture is winning
+        board.pop()
+        return gain[0]
+    
+    # Find least valuable attacker
+    min_attacker_value = float('inf')
+    next_attacker_square = None
+    
+    for sq in attackers:
+        piece = board.piece_at(sq)
+        if piece and PIECE_VALUES[piece.piece_type] < min_attacker_value:
+            min_attacker_value = PIECE_VALUES[piece.piece_type]
+            next_attacker_square = sq
+    
     board.pop()
     
-    if is_hanging:
-        gain -= PIECE_VALUES[attacker.piece_type]
+    if next_attacker_square is None:
+        return gain[0]
     
-    return gain
+    # Simple evaluation: gain - attacker_value if recapture exists
+    gain.append(-PIECE_VALUES[attacker.piece_type])
+    
+    return sum(gain)
 
 
 def score_move(board, move, info, ply, hash_move):
-    """Score move for ordering."""
+    """Score move for ordering with enhanced heuristics."""
     score = 0
     
-    # 1. Hash move (from TT)
+    # 1. Hash move (from TT) - highest priority
     if move == hash_move:
         return 100000
     
@@ -205,18 +234,27 @@ def score_move(board, move, info, ply, hash_move):
     if move.promotion:
         score = 8000 + PIECE_VALUES.get(move.promotion, 0)
     
-    # 4. Killer moves
+    # 4. Killer moves - two killer slots
     if move == info.killer_moves[ply][0]:
-        score = 7000
+        return 7500  # First killer
     elif move == info.killer_moves[ply][1]:
-        score = 6900
+        return 7400  # Second killer
     
-    # 5. History heuristic
-    score += info.history[(move.from_square, move.to_square)]
+    # 5. Countermove heuristic
+    if info.last_move and info.countermoves.get(info.last_move) == move:
+        score = 7000
     
-    # 6. Checks
+    # 6. History heuristic (capped at 5000)
+    history_score = info.history.get((move.from_square, move.to_square), 0)
+    score += min(history_score, 5000)
+    
+    # 7. Checks bonus
     if board.gives_check(move):
         score += 500
+    
+    # 8. Castling bonus
+    if board.is_castling(move):
+        score += 300
     
     return score
 
@@ -355,6 +393,17 @@ def alpha_beta(board, depth, alpha, beta, info, ply, do_null=True):
         if null_score is not None and null_score >= beta:
             return beta
     
+    # Razoring - if eval is very low, go straight to quiescence
+    if depth <= 3 and not in_check and abs(alpha) < MATE_SCORE - 100:
+        eval_score = evaluate_incremental(board)
+        razor_margin = [0, 300, 400, 600][depth]
+        
+        if eval_score + razor_margin < alpha:
+            # Do quiescence search to verify
+            q_score = quiescence_search(board, alpha, beta, info, ply)
+            if q_score < alpha:
+                return q_score
+    
     # Futility pruning
     futility = False
     if depth <= 3 and not in_check and abs(alpha) < MATE_SCORE - 100:
@@ -380,6 +429,10 @@ def alpha_beta(board, depth, alpha, beta, info, ply, do_null=True):
         # Futility pruning - skip quiet moves in low depth
         if futility and moves_searched > 0 and not board.is_capture(move) and not move.promotion:
             continue
+        
+        # Save previous last_move
+        prev_last_move = info.last_move
+        info.last_move = move
         
         board.push(move)
         
@@ -408,6 +461,10 @@ def alpha_beta(board, depth, alpha, beta, info, ply, do_null=True):
                 score = -alpha_beta(board, depth - 1, -beta, -alpha, info, ply + 1, True)
         
         board.pop()
+        
+        # Restore last_move
+        info.last_move = prev_last_move
+        
         moves_searched += 1
         
         if score > best_score:
@@ -423,14 +480,25 @@ def alpha_beta(board, depth, alpha, beta, info, ply, do_null=True):
                     # Beta cutoff
                     bound_type = TranspositionTable.LOWER_BOUND
                     
-                    # Update killer moves
+                    # Update killer moves and countermoves for quiet moves
                     if not board.is_capture(move):
+                        # Update killer moves
                         if info.killer_moves[ply][0] != move:
                             info.killer_moves[ply][1] = info.killer_moves[ply][0]
                             info.killer_moves[ply][0] = move
                         
-                        # Update history heuristic
-                        info.history[(move.from_square, move.to_square)] += depth * depth
+                        # Update history heuristic with bonus
+                        bonus = depth * depth
+                        info.history[(move.from_square, move.to_square)] += bonus
+                        
+                        # Cap history values to prevent overflow
+                        if info.history[(move.from_square, move.to_square)] > 10000:
+                            # Age all history values
+                            for key in info.history:
+                                info.history[key] //= 2
+                        
+                        # Update countermove
+                        info.update_countermove(info.last_move, move)
                     
                     break
     
@@ -455,25 +523,29 @@ def iterative_deepening(board, max_depth, time_limit=10.0):
         if info.stopped:
             break
         
-        # Aspiration window
+        # Aspiration window with dynamic widening
         if depth > 4:
-            alpha = best_score - 50
-            beta = best_score + 50
+            window = 25  # Start with narrow window
+            alpha = best_score - window
+            beta = best_score + window
         else:
             alpha = -INFINITY
             beta = INFINITY
         
-        # Search with aspiration window
+        # Search with aspiration window and progressive widening
+        research_count = 0
         while True:
             score = alpha_beta(board, depth, alpha, beta, info, 0, True)
             
             # Check if we need to re-search
             if score <= alpha:
-                # Fail low - research with wider window
-                alpha = -INFINITY
+                # Fail low - widen window down
+                alpha = max(alpha - window * (2 ** research_count), -INFINITY)
+                research_count += 1
             elif score >= beta:
-                # Fail high - research with wider window
-                beta = INFINITY
+                # Fail high - widen window up
+                beta = min(beta + window * (2 ** research_count), INFINITY)
+                research_count += 1
             else:
                 # Success
                 best_score = score
@@ -481,7 +553,7 @@ def iterative_deepening(board, max_depth, time_limit=10.0):
                     best_move = info.pv_table[0][0]
                 break
             
-            if info.stopped:
+            if info.stopped or research_count > 3:
                 break
         
         # Print search info
@@ -493,6 +565,10 @@ def iterative_deepening(board, max_depth, time_limit=10.0):
         
         # Stop if mate found
         if abs(best_score) > MATE_SCORE - 100:
+            break
+        
+        # Early exit if running out of time (use 80% of time for current depth)
+        if elapsed > time_limit * 0.8:
             break
     
     print("-" * 80)
