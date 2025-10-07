@@ -160,6 +160,85 @@
             "border_corner_radius": 4,
             "border_width": 1,
             "border_colour": "#BABABA"
+        },
+        "@danger_button":
+        {
+            "font":
+            {
+                "name": "Arial",
+                "size": 14,
+                "bold": true
+            },
+            "colours":
+            {
+                "normal_bg": "#DC3545",
+                "hovered_bg": "#E05461",
+                "active_bg": "#BB2D3B",
+                "normal_text": "#FFFFFF",
+                "hovered_text": "#FFFFFF",
+                "active_text": "#FFFFFF"
+            },
+            "padding": [8, 8],
+            "border_corner_radius": 6
+        },
+        "@success_button":
+        {
+            "font":
+            {
+                "name": "Arial",
+                "size": 14,
+                "bold": true
+            },
+            "colours":
+            {
+                "normal_bg": "#28A745",
+                "hovered_bg": "#48B461",
+                "active_bg": "#218838",
+                "normal_text": "#FFFFFF",
+                "hovered_text": "#FFFFFF",
+                "active_text": "#FFFFFF"
+            },
+            "padding": [8, 8],
+            "border_corner_radius": 6
+        },
+        "@secondary_button":
+        {
+            "font":
+            {
+                "name": "Arial",
+                "size": 14,
+                "bold": false
+            },
+            "colours":
+            {
+                "normal_bg": "#6C757D",
+                "hovered_bg": "#7C858D",
+                "active_bg": "#5C656D",
+                "normal_text": "#FFFFFF",
+                "hovered_text": "#FFFFFF",
+                "active_text": "#FFFFFF"
+            },
+            "padding": [8, 8],
+            "border_corner_radius": 6
+        },
+        "@dropdown":
+        {
+            "font":
+            {
+                "name": "Arial",
+                "size": 16,
+                "bold": false
+            },
+            "colours":
+            {
+                "normal_bg": "#FFFFFF",
+                "hovered_bg": "#F5F5F5",
+                "normal_text": "#333333"
+            },
+            "padding": [10, 10],
+            "border_corner_radius": 4,
+            "border_width": 2,
+            "border_colour": "#4A90E2"
         }
     }
 }

@@ -77,8 +77,12 @@ position_values = {
 }
 
 # Load Syzygy tablebases
-syzygy_path =r'R:\TDMU\KIEN_THUC_TDMU\3_year_HK2\TriTueNT\chess-ai\syzygy'  # Update this path to your actual Syzygy tablebase files
-tablebase = chess.syzygy.open_tablebase(syzygy_path)
+try:
+    syzygy_path = r'R:\_Documents\_TDMU\KIEN_THUC_TDMU\3_year_HK2\TriTueNT\chess-ai\syzygy'
+    tablebase = chess.syzygy.open_tablebase(syzygy_path)
+except:
+    tablebase = None
+    # print("Warning: Syzygy tablebase not found in evaluation.py")
 
 def evaluate(board):
     """Optimized evaluation function for the board state."""

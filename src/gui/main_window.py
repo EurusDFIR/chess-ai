@@ -6,15 +6,41 @@ import chess
 import pygame
 import pygame_gui
 
-from src.ai.minimax import get_best_move
+# Use optimized AI instead of old one
+from src.ai.minimax_optimized import get_best_move
 from src.ai.opening_book import OpeningBook
 from pygame_gui.core import ObjectID
+
+from src.gui.gui_improvements import (
+    ai_move_threaded,
+    ai_move_queue,
+    ai_thinking,
+    last_move,
+    captured_white,
+    captured_black,
+    track_captured_pieces,
+    draw_last_move_highlight,
+    draw_captured_pieces,
+    draw_material_count,
+    draw_ai_thinking_indicator
+)
+
+from src.gui.game_controls import get_game_controls
 
 # Add path to import from the root directory
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-BOOK_PATH = r"R:\\TDMU\\KIEN_THUC_TDMU\\3_year_HK2\\TriTueNT\\chess-ai\\opening_bin\\gm2600.bin"
-opening_book = OpeningBook(BOOK_PATH)
+# Fix opening book path - use relative path from script location
+BOOK_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "opening_bin", "gm2600.bin")
+BOOK_PATH = os.path.normpath(BOOK_PATH)
+
+# Check if opening book exists, if not use None
+if os.path.exists(BOOK_PATH):
+    opening_book = OpeningBook(BOOK_PATH)
+else:
+    print(f"⚠️  Warning: Opening book not found at {BOOK_PATH}")
+    print("AI will use minimax search from the start.")
+    opening_book = None
 
 # Load piece images
 def load_pieces():
@@ -32,32 +58,35 @@ def load_pieces():
                 print(f"Error loading image for key {key} from path {path}: {e}")
     return pieces
 
-def run_gui():
+# Global game_controls - needed by ai_move()
+game_controls = None
 
+def run_gui():
+    global game_controls
 
     pygame.init()
-    pygame.mixer.init()  # Khởi tạo mixer để chơi nhạc
+    pygame.mixer.init()  # Khoi tao mixer de choi nhac
     pygame.display.set_caption("Eury engine v1")
     WIDTH, HEIGHT = 800, 600
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
-    # **ĐOẠN CODE TEST ÂM THANH ĐƯỢC CHÈN VÀO ĐÂY**
-    print("--- ÂM THANH TEST BẮT ĐẦU ---")  # Thêm dòng này để dễ nhận biết output test
+    # **DOAN CODE TEST AM THANH DUOC CHEN VAO DAY**
+    print("--- AM THANH TEST BAT DAU ---")  # Them dong nay de de nhan biet output test
     music_path_test = os.path.join(os.path.dirname(__file__), "..", "gui", "assets", "music", "background_music.mp3")
     music_path_test = os.path.normpath(music_path_test)
 
     if not os.path.exists(music_path_test):
-        print(f"Lỗi TEST: File nhạc không tìm thấy tại '{music_path_test}'. Vui lòng kiểm tra đường dẫn.")
+        print(f"Loi TEST: File nhac khong tim thay tai '{music_path_test}'. Vui long kiem tra duong dan.")
     else:
         try:
             pygame.mixer.music.load(music_path_test)
-            pygame.mixer.music.play(-1)  # Phát nhạc lặp lại
+            pygame.mixer.music.play(-1)  # Phat nhac lap lai
             pygame.mixer.music.set_volume(0.7)
-            print("TEST THÀNH CÔNG: Đang phát nhạc...")
+            print("TEST THANH CONG: Dang phat nhac...")
         except pygame.error as e:
-            print(f"Lỗi TEST khi tải file nhạc: {e}")
-    print("--- ÂM THANH TEST KẾT THÚC ---")  # Thêm dòng này để dễ nhận biết output test
-    # **KẾT THÚC ĐOẠN CODE TEST ÂM THANH**
+            print(f"Loi TEST khi tai file nhac: {e}")
+    print("--- AM THANH TEST KET THUC ---")  # Them dong nay de de nhan biet output test
+    # **KET THUC DOAN CODE TEST AM THANH**
 
 
 
@@ -103,6 +132,10 @@ def run_gui():
     theme_path = os.path.join(os.path.dirname(__file__), 'theme.json')
     manager = pygame_gui.UIManager((WIDTH, HEIGHT), theme_path)  # Load theme file
 
+    # Create game controls
+    game_controls = get_game_controls(manager, WIDTH, HEIGHT)
+    game_controls.create_game_buttons()
+
     HOME_BG_COLOR = (220, 220, 220) # Màu nền trang chủ
     LIGHT = (220, 230, 240)  # Xanh lam rất nhạt
     DARK = (150, 170, 190)  # Xanh lam xám
@@ -137,6 +170,12 @@ def run_gui():
     highlighted_squares = set()
 
     current_screen = "home"
+    
+    # Game state for controls
+    game_active = False
+    game_result = None
+    time_dropdown = None
+    level_dropdown = None
 
     # Create buttons
     global home_buttons
@@ -220,11 +259,15 @@ def run_gui():
     def init_game_time():
         global white_time, black_time, start_time, current_player, game_started
 
-        white_time = 300
-        black_time = 300
+        # Get selected time control from game_controls
+        time_control = game_controls.get_selected_time_control()
+        white_time = time_control['time']
+        black_time = time_control['time']
         start_time = pygame.time.get_ticks()
         current_player = chess.WHITE
         game_started = True
+        
+        print(f"⏱️ Game started with {time_control['name']}")
 
 
     # Show home screen buttons initially
@@ -232,10 +275,11 @@ def run_gui():
         button.show()
 
     while running:
+        global ai_thinking, last_move
         time_delta = clock.tick(60)/1000.0
-        if current_screen == "game" and game_started:
-
-
+        
+        # Update timer only when game is active and AI is not thinking
+        if current_screen == "game" and game_started and not ai_thinking:
             if current_player == chess.WHITE:
                 white_time -= time_delta  # Sử dụng time_delta trực tiếp
             else:
@@ -246,8 +290,33 @@ def run_gui():
 
             white_clock_label.set_text(format_time(white_time))
             black_clock_label.set_text(format_time(black_time))
+            
+            # Check timeout
+            if white_time <= 0 and game_active:
+                game_result = 'timeout_black'
+                print("⏰ White timeout! Black wins!")
+                game_active = False
+                game_controls.show_game_buttons(game_active=False)
+            elif black_time <= 0 and game_active:
+                game_result = 'timeout_white'
+                print("⏰ Black timeout! White wins!")
+                game_active = False
+                game_controls.show_game_buttons(game_active=False)
 
 
+        # Check for AI move completion (from queue)
+        if not ai_move_queue.empty():
+            move = ai_move_queue.get()
+            if move is not None:
+                print(f"✅ AI chọn: {move}")
+                board.push(move)
+                track_captured_pieces(move, board)
+                last_move = move
+            else:
+                print("AI returned None for move.")
+            ai_thinking = False
+            current_player = board.turn
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -256,12 +325,24 @@ def run_gui():
                     if event.ui_element == play_button:
                         current_screen = "game"
                         init_game_time()
+                        game_active = True
+                        game_result = None
+                        
+                        # Reset board
+                        board = chess.Board()
+                        captured_white.clear()
+                        captured_black.clear()
+                        last_move = None
+                        
                         # Hide home screen buttons when switching to game
                         for button in home_buttons:
                             button.hide()
                         # Show clock labels when switching to game
                         white_clock_label.show()
                         black_clock_label.show()
+                        # Show game control buttons
+                        game_controls.show_game_buttons(game_active=True)
+                        
                     elif event.ui_element == settings_button:
                         current_screen = "settings"
                         # Hide home screen buttons, show back button for settings
@@ -301,6 +382,65 @@ def run_gui():
                         # Hide clock labels when switching from game
                         white_clock_label.hide()
                         black_clock_label.hide()
+                        # Hide game control buttons
+                        game_controls.hide_game_buttons()
+                        # Kill dropdowns if exist
+                        if time_dropdown:
+                            time_dropdown.kill()
+                            time_dropdown = None
+                        if level_dropdown:
+                            level_dropdown.kill()
+                            level_dropdown = None
+                    
+                    # Game control buttons
+                    elif event.ui_element == game_controls.resign_button:
+                        print("🏳️ Player resigned!")
+                        game_result = 'black_win'
+                        game_active = False
+                        game_controls.show_game_buttons(game_active=False)
+                    
+                    elif event.ui_element == game_controls.draw_button:
+                        print("🤝 Draw agreed!")
+                        game_result = 'draw'
+                        game_active = False
+                        game_controls.show_game_buttons(game_active=False)
+                    
+                    elif event.ui_element == game_controls.rematch_button:
+                        print("🔄 Starting rematch...")
+                        # Reset game
+                        board = chess.Board()
+                        captured_white.clear()
+                        captured_black.clear()
+                        last_move = None
+                        init_game_time()
+                        game_active = True
+                        game_result = None
+                        game_controls.show_game_buttons(game_active=True)
+                    
+                    elif event.ui_element == game_controls.home_button:
+                        print("🏠 Going home...")
+                        current_screen = "home"
+                        game_active = False
+                        game_result = None
+                        
+                        # Show home buttons
+                        for button in home_buttons:
+                            button.show()
+                        
+                        # Hide game buttons and clocks
+                        game_controls.hide_game_buttons()
+                        white_clock_label.hide()
+                        black_clock_label.hide()
+                
+                # Dropdown selection handlers
+                elif event.user_type == pygame_gui.UI_DROP_DOWN_MENU_CHANGED:
+                    if time_dropdown and event.ui_element == time_dropdown:
+                        game_controls.set_time_control(event.text)
+                        print(f"⏱️ Time control: {event.text}")
+                    
+                    elif level_dropdown and event.ui_element == level_dropdown:
+                        game_controls.set_ai_level(event.text)
+                        print(f"🤖 AI level: {event.text}")
 
 
             elif event.type == pygame.MOUSEBUTTONDOWN and current_screen == "game":
@@ -308,8 +448,28 @@ def run_gui():
             elif event.type == pygame.MOUSEBUTTONUP and current_screen == "game":
                 move_made = handle_mouse_up(event.pos, event.button)
                 if move_made:
-                    current_player = not current_player
+                    move = board.peek()  # Get the last move that was just made
+                    track_captured_pieces(move, board)
+                    last_move = move
+                    current_player = board.turn
                     start_time = pygame.time.get_ticks()
+                    
+                    # Check game over conditions
+                    if board.is_checkmate():
+                        if board.turn == chess.WHITE:
+                            game_result = 'checkmate_black'
+                            print("♔ Black wins by checkmate!")
+                        else:
+                            game_result = 'checkmate_white'
+                            print("♔ White wins by checkmate!")
+                        game_active = False
+                        game_controls.show_game_buttons(game_active=False)
+                    
+                    elif board.is_stalemate():
+                        game_result = 'stalemate'
+                        print("🤝 Draw by stalemate!")
+                        game_active = False
+                        game_controls.show_game_buttons(game_active=False)
 
             elif event.type == pygame.MOUSEMOTION and current_screen == "game":
                 handle_mouse_motion(event.pos)
@@ -327,9 +487,28 @@ def run_gui():
             manager.draw_ui(screen)  # Vẽ UI Manager lên trên ảnh nền (hoặc màu nền)
         elif current_screen == "game":
             draw_board(screen, board, piece_images, LIGHT, DARK, HIGHLIGHT, dragging_piece, dragging_start_pos, legal_moves, ARROW_COLOR, drawn_arrows, arrow_start_square, arrow_end_square, drawing_arrow, highlighted_squares, background_image,font)
+            
+            # Draw GUI improvements
+            if last_move is not None:
+                draw_last_move_highlight(screen, last_move)
+            draw_captured_pieces(screen, captured_white, captured_black, piece_images)
+            draw_material_count(screen, board)
+            if ai_thinking:
+                draw_ai_thinking_indicator(screen, WIDTH, HEIGHT)
+            
             draw_pieces(screen, board, piece_images, dragging_piece, dragging_start_pos)
+            
+            # Draw game result overlay if game ended
+            if game_result:
+                game_controls.draw_game_status(screen, game_result)
+            
             manager.draw_ui(screen)
         elif current_screen == "settings":
+            # Create dropdowns if not exist
+            if time_dropdown is None:
+                time_dropdown = game_controls.create_time_selector()
+                level_dropdown = game_controls.create_level_selector()
+            
             draw_settings(screen, WIDTH, HEIGHT, HOME_BG_COLOR)
             manager.draw_ui(screen)
         elif current_screen == "about":
@@ -512,6 +691,7 @@ def handle_mouse_down(pos, button):
 def handle_mouse_up(pos, button):
     global selected_square, dragging_piece, dragging_start_pos, legal_moves
     global drawing_arrow, arrow_start_square, arrow_end_square, drawn_arrows, highlighted_squares
+    global game_controls
     move_made = False
 
     square = get_square_from_pos(pos)
@@ -543,25 +723,34 @@ def handle_mouse_motion(pos):
     dragging_start_pos = pos
     arrow_end_square = pos
 
-# AI move function
+# AI move function - UPDATED with threading and AI level
 def ai_move():
-    import cProfile
-    import pstats
-
-    profiler = cProfile.Profile()
-    profiler.enable()
-
-    move = opening_book.get_move(board)
-    if move is None:
-        move = get_best_move(board, depth=3)
-    if move is not None:
-        board.push(move)
-    else:
-        print("AI returned None for move. No move pushed.")
-
-    profiler.disable()
-    stats = pstats.Stats(profiler).sort_stats('cumulative')
-    stats.print_stats(20)
+    global ai_thinking, game_controls
+    
+    # Set AI thinking flag
+    ai_thinking = True
+    
+    # Try opening book first (if available)
+    move = None
+    if opening_book is not None:
+        try:
+            move = opening_book.get_move(board)
+            if move is not None:
+                print(f"📖 Opening book: {move}")
+                board.push(move)
+                track_captured_pieces(move, board)
+                ai_thinking = False
+                return
+        except Exception as e:
+            print(f"⚠️  Error using opening book: {e}")
+    
+    # If no book move, use AI search in background thread
+    # Get AI settings from game_controls
+    ai_level = game_controls.get_selected_ai_level()
+    print(f"🤖 AI thinking... (Level: {ai_level['name']})")
+    
+    board_copy = board.copy()
+    ai_move_threaded(board_copy, depth=ai_level['depth'], time_limit=ai_level['time'])
 
 if __name__ == "__main__":
     run_gui()

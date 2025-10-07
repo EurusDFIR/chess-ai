@@ -1,0 +1,199 @@
+{
+  "button": {
+    "colours": {
+      "normal_bg": "#3d5a80",
+      "hovered_bg": "#4a6fa5",
+      "active_bg": "#2e4057",
+      "normal_text": "#ffffff",
+      "hovered_text": "#ffffff",
+      "active_text": "#ffffff",
+      "normal_border": "#2e4057",
+      "hovered_border": "#4a6fa5",
+      "active_border": "#1a2634"
+    },
+    "font": {
+      "name": "fira_code",
+      "size": "14",
+      "bold": "1"
+    },
+    "misc": {
+      "border_width": "2",
+      "shadow_width": "2",
+      "shape_corner_radius": "8"
+    }
+  },
+  "@title_label": {
+    "colours": {
+      "dark_bg": "#1c1c1c",
+      "normal_text": "#98c1d9"
+    },
+    "font": {
+      "size": "36",
+      "bold": "1"
+    },
+    "misc": {
+      "shape_corner_radius": "0",
+      "border_width": "0"
+    }
+  },
+  "@home_button": {
+    "colours": {
+      "normal_bg": "#457b9d",
+      "hovered_bg": "#5a9bc5",
+      "active_bg": "#2e5a7a",
+      "normal_text": "#ffffff",
+      "hovered_text": "#ffffff",
+      "active_text": "#ffffff"
+    },
+    "font": {
+      "size": "20",
+      "bold": "1"
+    },
+    "misc": {
+      "shape_corner_radius": "12",
+      "border_width": "0",
+      "shadow_width": "3"
+    }
+  },
+  "@danger_button": {
+    "colours": {
+      "normal_bg": "#d62828",
+      "hovered_bg": "#f77f00",
+      "active_bg": "#b81717",
+      "normal_text": "#ffffff",
+      "hovered_text": "#ffffff",
+      "active_text": "#ffffff"
+    },
+    "misc": {
+      "shape_corner_radius": "8",
+      "border_width": "0"
+    }
+  },
+  "@success_button": {
+    "colours": {
+      "normal_bg": "#2a9d8f",
+      "hovered_bg": "#3dbfa8",
+      "active_bg": "#1f7a70",
+      "normal_text": "#ffffff",
+      "hovered_text": "#ffffff",
+      "active_text": "#ffffff"
+    },
+    "misc": {
+      "shape_corner_radius": "8",
+      "border_width": "0"
+    }
+  },
+  "@secondary_button": {
+    "colours": {
+      "normal_bg": "#4a5859",
+      "hovered_bg": "#5d7173",
+      "active_bg": "#3a4647",
+      "normal_text": "#ffffff",
+      "hovered_text": "#ffffff",
+      "active_text": "#ffffff"
+    },
+    "misc": {
+      "shape_corner_radius": "8",
+      "border_width": "0"
+    }
+  },
+  "@info_button": {
+    "colours": {
+      "normal_bg": "#457b9d",
+      "hovered_bg": "#5a9bc5",
+      "active_bg": "#2e5a7a",
+      "normal_text": "#ffffff",
+      "hovered_text": "#ffffff",
+      "active_text": "#ffffff"
+    },
+    "misc": {
+      "shape_corner_radius": "8",
+      "border_width": "0"
+    }
+  },
+  "@back_button": {
+    "colours": {
+      "normal_bg": "#e76f51",
+      "hovered_bg": "#f28a6f",
+      "active_bg": "#d95838",
+      "normal_text": "#ffffff"
+    },
+    "misc": {
+      "shape_corner_radius": "8"
+    }
+  },
+  "@clock_white": {
+    "colours": {
+      "dark_bg": "#f0f0f0",
+      "normal_text": "#1a1a1a"
+    },
+    "font": {
+      "name": "fira_code",
+      "size": "32",
+      "bold": "1"
+    },
+    "misc": {
+      "shape_corner_radius": "10",
+      "border_width": "3",
+      "shadow_width": "3"
+    }
+  },
+  "@clock_black": {
+    "colours": {
+      "dark_bg": "#2d2d2d",
+      "normal_text": "#f0f0f0"
+    },
+    "font": {
+      "name": "fira_code",
+      "size": "32",
+      "bold": "1"
+    },
+    "misc": {
+      "shape_corner_radius": "10",
+      "border_width": "3",
+      "shadow_width": "3"
+    }
+  },
+  "label": {
+    "colours": {
+      "dark_bg": "#3d5a80",
+      "normal_text": "#ffffff"
+    },
+    "font": {
+      "size": "16"
+    }
+  },
+  "drop_down_menu": {
+    "colours": {
+      "normal_bg": "#3d5a80",
+      "hovered_bg": "#4a6fa5",
+      "selected_bg": "#2e4057",
+      "normal_text": "#ffffff",
+      "selected_text": "#ffffff"
+    },
+    "misc": {
+      "shape_corner_radius": "6",
+      "border_width": "2"
+    }
+  },
+  "@analysis_panel": {
+    "colours": {
+      "dark_bg": "#1c1c1c",
+      "normal_border": "#3d5a80"
+    },
+    "misc": {
+      "shape_corner_radius": "8",
+      "border_width": "2"
+    }
+  },
+  "@analysis_title": {
+    "colours": {
+      "dark_bg": "#1c1c1c",
+      "normal_text": "#98c1d9"
+    },
+    "font": {
+      "size": "18",
+      "bold": "1"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+README.md
+setup.py
+src/ai/__init__.py
+src/ai/evaluation.py
+src/ai/evaluation_optimized.py
+src/ai/minimax.py
+src/ai/minimax_optimized.py
+src/ai/opening_book.py
+src/chess_ai.egg-info/PKG-INFO
+src/chess_ai.egg-info/SOURCES.txt
+src/chess_ai.egg-info/dependency_links.txt
+src/chess_ai.egg-info/not-zip-safe
+src/chess_ai.egg-info/requires.txt
+src/chess_ai.egg-info/top_level.txt
+src/gui/__init__.py
+src/gui/main_window.py
