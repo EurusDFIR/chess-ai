@@ -13,11 +13,11 @@ class BoardWidget:
     SQUARE_SIZE = 64
     BOARD_SIZE = SQUARE_SIZE * 8
     
-    # Colors - Lichess Theme
-    LIGHT_SQUARE = (240, 217, 181)  # Nâu sáng
-    DARK_SQUARE = (181, 136, 99)    # Nâu đậm
-    HIGHLIGHT = (255, 255, 102, 150)  # Vàng trong suốt
-    LAST_MOVE = (155, 199, 0, 100)   # Xanh lá trong suốt
+    # Colors - Chess.com Theme (Green & White)
+    LIGHT_SQUARE = (235, 236, 208)  # Kem sáng
+    DARK_SQUARE = (115, 149, 82)    # Xanh lá
+    HIGHLIGHT = (186, 202, 68, 150)  # Xanh vàng trong suốt
+    LAST_MOVE = (206, 210, 107, 120)   # Vàng xanh trong suốt
     ARROW_COLOR = (255, 170, 0)      # Cam
     LEGAL_MOVE_DOT = (32, 127, 70, 180)  # Green dot for legal moves
     LEGAL_MOVE_CIRCLE = (32, 127, 70, 120)  # Green circle for captures

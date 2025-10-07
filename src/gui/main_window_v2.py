@@ -301,6 +301,24 @@ class ChessGame:
             object_id=pygame_gui.core.ObjectID(class_id='@back_button')
         )
         self.about_back_button.hide()
+        
+        # Time control dropdown
+        self.time_control_dropdown = pygame_gui.elements.UIDropDownMenu(
+            options_list=list(self.time_controls.keys()),
+            starting_option=self.selected_time_control,
+            relative_rect=pygame.Rect((WINDOW_WIDTH//2 - 150, 220), (300, 50)),
+            manager=self.manager
+        )
+        self.time_control_dropdown.hide()
+        
+        # AI level dropdown
+        self.ai_level_dropdown = pygame_gui.elements.UIDropDownMenu(
+            options_list=list(self.ai_levels.keys()),
+            starting_option=self.selected_ai_level,
+            relative_rect=pygame.Rect((WINDOW_WIDTH//2 - 150, 310), (300, 50)),
+            manager=self.manager
+        )
+        self.ai_level_dropdown.hide()
     
     def _load_music(self):
         """Load background music"""
@@ -539,24 +557,33 @@ class ChessGame:
         
         # Content
         font_medium = pygame.font.Font(None, 32)
-        y = 200
+        font_small = pygame.font.Font(None, 28)
+        y = 180
         
+        # Time Control Label
+        label = font_medium.render("Time Control:", True, TEXT_COLOR)
+        self.screen.blit(label, (WINDOW_WIDTH//2 - 150, y))
+        y += 90
+        
+        # AI Difficulty Label
+        label = font_medium.render("AI Difficulty:", True, TEXT_COLOR)
+        self.screen.blit(label, (WINDOW_WIDTH//2 - 150, y))
+        y += 120
+        
+        # Instructions
         texts = [
-            "Time Control: Blitz 5+0",
-            "AI Difficulty: Hard",
             "",
-            "Coming soon:",
-            "- Customizable time controls",
-            "- AI difficulty selector", 
-            "- Board themes",
-            "- Sound settings"
+            "Controls:",
+            "  - Click and drag pieces to move",
+            "  - Right-click to draw arrows",
+            "  - Analysis mode available during game"
         ]
         
         for text in texts:
             if text:
-                surface = font_medium.render(text, True, TEXT_COLOR)
+                surface = font_small.render(text, True, (200, 200, 200))
                 self.screen.blit(surface, (100, y))
-            y += 45
+            y += 35
     
     def _draw_about(self):
         """Draw about screen"""
@@ -604,6 +631,15 @@ class ChessGame:
         # UI events
         if event.type == pygame_gui.UI_BUTTON_PRESSED:
             self._handle_button_press(event.ui_element)
+        
+        # Dropdown menu changed
+        if event.type == pygame_gui.UI_DROP_DOWN_MENU_CHANGED:
+            if event.ui_element == self.time_control_dropdown:
+                self.selected_time_control = event.text
+                print(f"[Settings] Time control changed to: {event.text}")
+            elif event.ui_element == self.ai_level_dropdown:
+                self.selected_ai_level = event.text
+                print(f"[Settings] AI level changed to: {event.text}")
         
         # Analysis panel events
         if self.analysis_mode and self.analysis_panel.handle_event(event):
@@ -678,6 +714,8 @@ class ChessGame:
             for btn in self.home_buttons:
                 btn.hide()
             self.settings_back_button.show()
+            self.time_control_dropdown.show()
+            self.ai_level_dropdown.show()
         
         elif button == self.about_button:
             self.current_screen = "about"
@@ -688,6 +726,8 @@ class ChessGame:
         elif button == self.settings_back_button:
             self.current_screen = "home"
             self.settings_back_button.hide()
+            self.time_control_dropdown.hide()
+            self.ai_level_dropdown.hide()
             for btn in self.home_buttons:
                 btn.show()
         
