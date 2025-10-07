@@ -1,12 +1,12 @@
 """
-Captured Pieces Widget - Hiển thị quân bị ăn và material difference
+Captured Pieces Widget - Lichess-style compact design
 """
 import pygame
 import chess
 
 
 class CapturedPiecesWidget:
-    """Widget hiển thị quân đã bị ăn"""
+    """Widget hiển thị quân đã bị ăn - Lichess style"""
     
     PIECE_VALUES = {
         'P': 1, 'N': 3, 'B': 3, 'R': 5, 'Q': 9, 'K': 0
@@ -19,13 +19,21 @@ class CapturedPiecesWidget:
         self.y = y
         self.width = width
         
-        self.captured_white = []  # Quân trắng bị ăn
-        self.captured_black = []  # Quân đen bị ăn
+        self.captured_white = []
+        self.captured_black = []
         
-        self.font = pygame.font.Font(None, 24)
-        self.title_font = pygame.font.Font(None, 20)
+        # Lichess-style fonts
+        try:
+            self.font = pygame.font.SysFont('Segoe UI', 14, bold=True)
+        except:
+            self.font = pygame.font.Font(None, 18)
         
-        self.visible = True  # Add visibility flag
+        # Lichess colors
+        self.bg_color = (37, 36, 34)
+        self.text_color = (189, 176, 153)
+        self.advantage_color = (120, 190, 80)  # Green for advantage
+        
+        self.visible = True
     
     def track_capture(self, move, board):
         """Track quân bị ăn từ move - GỌI TRƯỚC KHI PUSH"""
@@ -42,22 +50,52 @@ class CapturedPiecesWidget:
                 print(f"⚫ Captured black {captured_piece.symbol()}")
     
     def draw(self):
-        """Vẽ captured pieces"""
-        if not self.visible:  # Skip if hidden
+        """Vẽ captured pieces - Lichess style"""
+        if not self.visible:
             return
-            
-        # Vẽ tiêu đề
-        title = self.title_font.render("Captured", True, (200, 200, 200))
-        self.screen.blit(title, (self.x, self.y))
         
-        # Tính material difference
+        # Background
+        pygame.draw.rect(self.screen, self.bg_color,
+                        (self.x, self.y, self.width, 85))
+        
+        # Calculate material
         white_material = sum(self.PIECE_VALUES.get(p, 0) for p in self.captured_black)
         black_material = sum(self.PIECE_VALUES.get(p, 0) for p in self.captured_white)
         material_diff = white_material - black_material
         
-        y_offset = 30
+        # Compact piece display
+        piece_size = 18
+        spacing = 20
+        y_pos = self.y + 8
         
-        # Vẽ captured black pieces (white đã ăn)
+        # White captured pieces (black advantage) - top row
+        x_pos = self.x + 8
+        for piece in self.captured_black:
+            piece_key = f'w{piece}'
+            if piece_key in self.piece_images:
+                img = pygame.transform.smoothscale(self.piece_images[piece_key], (piece_size, piece_size))
+                self.screen.blit(img, (x_pos, y_pos))
+                x_pos += spacing
+        
+        # Show white advantage if any
+        if material_diff > 0:
+            adv_text = self.font.render(f'+{material_diff}', True, self.advantage_color)
+            self.screen.blit(adv_text, (x_pos + 5, y_pos))
+        
+        # Black captured pieces (white advantage) - bottom row
+        y_pos += piece_size + 12
+        x_pos = self.x + 8
+        for piece in self.captured_white:
+            piece_key = f'b{piece}'
+            if piece_key in self.piece_images:
+                img = pygame.transform.smoothscale(self.piece_images[piece_key], (piece_size, piece_size))
+                self.screen.blit(img, (x_pos, y_pos))
+                x_pos += spacing
+        
+        # Show black advantage if any
+        if material_diff < 0:
+            adv_text = self.font.render(f'+{abs(material_diff)}', True, self.advantage_color)
+            self.screen.blit(adv_text, (x_pos + 5, y_pos))
         self._draw_captured_side(self.captured_black, self.y + y_offset, 
                                 material_diff if material_diff > 0 else 0, 'w')
         
