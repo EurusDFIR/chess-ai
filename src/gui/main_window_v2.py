@@ -333,13 +333,13 @@ class ChessGame:
     def _load_music(self):
         """Load background music"""
         music_path = os.path.join(os.path.dirname(__file__), "assets", "music", 
-                                 "background_music.mp3")
+                                 "Same Blue_Piano .mp3")
         if os.path.exists(music_path):
             try:
                 pygame.mixer.music.load(music_path)
                 pygame.mixer.music.play(-1)
                 pygame.mixer.music.set_volume(0.3)
-                print("[Music] Background music loaded")
+                print("[Music] Same Blue Piano music loaded")
             except:
                 print("[Warning] Could not load music")
     

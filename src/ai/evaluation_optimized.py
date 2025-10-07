@@ -74,14 +74,15 @@ PST_ROOK_MG = [
 ]
 
 PST_QUEEN_MG = [
-    -20, -10, -10, -5,  -5,  -10, -10, -20,
-    -10, 0,   0,   0,   0,   0,   0,   -10,
-    -10, 0,   5,   5,   5,   5,   0,   -10,
-    -5,  0,   5,   5,   5,   5,   0,   -5,
-    0,   0,   5,   5,   5,   5,   0,   -5,
-    -10, 5,   5,   5,   5,   5,   0,   -10,
-    -10, 0,   5,   0,   0,   0,   0,   -10,
-    -20, -10, -10, -5,  -5,  -10, -10, -20
+    # Hậu nên ở back rank trong opening, penalty nếu ra sớm
+    -20, -10, -10, -5,  -5,  -10, -10, -20,  # Rank 1 (back): OK
+    -10, -20, -20, -20, -20, -20, -20, -10,  # Rank 2: penalty -20
+    -10, -20, -10, -10, -10, -10, -20, -10,  # Rank 3: penalty -20/-10
+    -5,  -10, -5,  0,   0,   -5,  -10, -5,   # Rank 4: penalty -10/-5
+    0,   -5,  0,   5,   5,   0,   -5,  0,    # Rank 5: chút bonus +5
+    -10, -5,  0,   5,   5,   0,   -5,  -10,  # Rank 6: trung bình
+    -10, -10, -5,  0,   0,   -5,  -10, -10,  # Rank 7: penalty
+    -20, -10, -10, -5,  -5,  -10, -10, -20   # Rank 8: OK
 ]
 
 PST_KING_MG = [
@@ -368,6 +369,115 @@ def evaluate_bishops(board):
     return score
 
 
+def evaluate_center_control(board):
+    """Evaluate center control (e4, d4, e5, d5)."""
+    score = 0
+    center_squares = [chess.E4, chess.D4, chess.E5, chess.D5]
+    
+    for square in center_squares:
+        # Pawns in center
+        piece = board.piece_at(square)
+        if piece and piece.piece_type == chess.PAWN:
+            score += 20 if piece.color == chess.WHITE else -20
+        
+        # Control of center squares
+        white_control = len(board.attackers(chess.WHITE, square))
+        black_control = len(board.attackers(chess.BLACK, square))
+        score += (white_control - black_control) * 5
+    
+    return score
+
+
+def evaluate_development(board):
+    """Evaluate piece development in opening."""
+    score = 0
+    
+    # White development
+    # Knights
+    white_knights = board.pieces(chess.KNIGHT, chess.WHITE)
+    for square in white_knights:
+        if square not in [chess.B1, chess.G1]:  # Moved from starting position
+            score += 15
+    
+    # Bishops
+    white_bishops = board.pieces(chess.BISHOP, chess.WHITE)
+    for square in white_bishops:
+        if square not in [chess.C1, chess.F1]:  # Moved from starting position
+            score += 15
+    
+    # Queen penalty if moved early
+    white_queens = board.pieces(chess.QUEEN, chess.WHITE)
+    for square in white_queens:
+        if square != chess.D1:  # Moved from starting position
+            score -= 20  # Penalty for early queen development
+    
+    # Black development
+    # Knights
+    black_knights = board.pieces(chess.KNIGHT, chess.BLACK)
+    for square in black_knights:
+        if square not in [chess.B8, chess.G8]:  # Moved from starting position
+            score -= 15
+    
+    # Bishops
+    black_bishops = board.pieces(chess.BISHOP, chess.BLACK)
+    for square in black_bishops:
+        if square not in [chess.C8, chess.F8]:  # Moved from starting position
+            score -= 15
+    
+    # Queen penalty if moved early
+    black_queens = board.pieces(chess.QUEEN, chess.BLACK)
+    for square in black_queens:
+        if square != chess.D8:  # Moved from starting position
+            score += 20  # Penalty for early queen development (negative for black)
+    
+    return score
+
+
+def evaluate_castling_rights(board):
+    """Evaluate castling and castling rights."""
+    score = 0
+    
+    # Bonus for having castled
+    if board.has_kingside_castling_rights(chess.WHITE) or board.has_queenside_castling_rights(chess.WHITE):
+        score += 20  # Bonus for maintaining castling rights
+    
+    if board.has_kingside_castling_rights(chess.BLACK) or board.has_queenside_castling_rights(chess.BLACK):
+        score -= 20
+    
+    # Bigger bonus for having actually castled (king on g1/g8 or c1/c8)
+    white_king_sq = board.king(chess.WHITE)
+    if white_king_sq in [chess.G1, chess.C1]:
+        score += 30
+    
+    black_king_sq = board.king(chess.BLACK)
+    if black_king_sq in [chess.G8, chess.C8]:
+        score -= 30
+    
+    return score
+
+
+def evaluate_opening_principles(board):
+    """Evaluate opening principles (only in opening phase)."""
+    move_count = board.fullmove_number
+    
+    # Only apply in opening (first 15 moves)
+    if move_count > 15:
+        return 0
+    
+    score = 0
+    
+    # Center control
+    score += evaluate_center_control(board) * 2
+    
+    # Development
+    score += evaluate_development(board) * 2
+    
+    # Castling
+    score += evaluate_castling_rights(board)
+    
+    return score
+
+
 def evaluate_incremental(board):
     """Main evaluation function with all components."""
     
@@ -392,6 +502,9 @@ def evaluate_incremental(board):
     score += evaluate_pawn_structure(board)
     score += evaluate_rooks(board)
     score += evaluate_bishops(board)
+    
+    # Opening principles (first 15 moves)
+    score += evaluate_opening_principles(board)
     
     # Return score from perspective of side to move
     return score if board.turn == chess.WHITE else -score

@@ -355,9 +355,18 @@ def alpha_beta(board, depth, alpha, beta, info, ply, do_null=True):
     if alpha >= beta:
         return alpha
     
-    # Check for draw
-    if board.is_insufficient_material() or board.is_seventyfive_moves() or board.is_fivefold_repetition():
+    # Check for draw - including threefold repetition (3 lần lặp)
+    if (board.is_insufficient_material() or 
+        board.is_seventyfive_moves() or 
+        board.is_fivefold_repetition() or
+        board.can_claim_threefold_repetition() or  # ← FIX: Luật hòa 3 lần lặp
+        board.can_claim_draw()):                    # ← FIX: Claim draw (50-move rule, etc)
         return 0
+    
+    # Penalty for repetition to avoid draws (tránh lặp nước không cần thiết)
+    if board.is_repetition(2):  # 2 lần lặp - cảnh báo
+        # Giảm điểm để engine tránh lặp nước
+        return 0 if ply == 0 else -50
     
     # Transposition table probe
     zobrist_hash = get_zobrist_hash(board)
