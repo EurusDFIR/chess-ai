@@ -28,9 +28,9 @@ class CapturedPiecesWidget:
         except:
             self.font = pygame.font.Font(None, 18)
         
-        # Lichess colors
-        self.bg_color = (37, 36, 34)
-        self.text_color = (189, 176, 153)
+        # Lichess colors (lighter background)
+        self.bg_color = (48, 46, 44)  # Match move history
+        self.text_color = (220, 210, 195)
         self.advantage_color = (120, 190, 80)  # Green for advantage
         
         self.visible = True

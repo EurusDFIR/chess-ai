@@ -23,40 +23,40 @@ class ControlPanel:
         self._create_buttons()
     
     def _create_buttons(self):
-        """Tạo các nút điều khiển - Icon-based như Lichess"""
+        """Tạo các nút điều khiển - Compact text buttons"""
         # Smaller, more compact buttons
-        button_width = 45
-        button_height = 45
+        button_width = 80
+        button_height = 35
         button_x = self.width - button_width - 20
         spacing = 8
         start_y = 390
         
-        # Resign button - Flag icon
+        # Resign button
         self.resign_button = pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect((button_x, start_y), (button_width, button_height)),
-            text='⚑',  # Flag icon
+            text='Resign',
             manager=self.manager,
-            object_id=ObjectID(class_id='@icon_button_danger'),
-            tool_tip_text='Resign'
+            object_id=ObjectID(class_id='@compact_danger'),
+            tool_tip_text='Resign the game'
         )
         
-        # Draw button - 1/2 symbol
+        # Draw button
         self.draw_button = pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect((button_x, start_y + (button_height + spacing)), 
                                      (button_width, button_height)),
-            text='½',  # Half symbol
+            text='Draw',
             manager=self.manager,
-            object_id=ObjectID(class_id='@icon_button'),
+            object_id=ObjectID(class_id='@compact_button'),
             tool_tip_text='Offer Draw'
         )
         
-        # Analysis button - Magnifying glass
+        # Analysis button
         self.analysis_button = pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect((button_x, start_y + (button_height + spacing) * 2), 
                                      (button_width, button_height)),
-            text='⚙',  # Settings/analysis icon
+            text='Analysis',
             manager=self.manager,
-            object_id=ObjectID(class_id='@icon_button_info'),
+            object_id=ObjectID(class_id='@compact_info'),
             tool_tip_text='Toggle Analysis'
         )
         
@@ -64,19 +64,19 @@ class ControlPanel:
         self.rematch_button = pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect((button_x, start_y + (button_height + spacing) * 3), 
                                      (button_width, button_height)),
-            text='↻',  # Refresh icon
+            text='Rematch',
             manager=self.manager,
-            object_id=ObjectID(class_id='@icon_button_success'),
-            tool_tip_text='Rematch'
+            object_id=ObjectID(class_id='@compact_success'),
+            tool_tip_text='Play Again'
         )
         
         # Home button
         self.home_button = pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect((button_x, start_y + (button_height + spacing) * 4), 
                                      (button_width, button_height)),
-            text='⌂',  # Home icon
+            text='Home',
             manager=self.manager,
-            object_id=ObjectID(class_id='@icon_button'),
+            object_id=ObjectID(class_id='@compact_button'),
             tool_tip_text='Return Home'
         )
         

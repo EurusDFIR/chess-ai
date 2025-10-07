@@ -23,12 +23,12 @@ class MoveHistoryWidget:
             self.font = pygame.font.Font(None, 18)
             self.move_num_font = pygame.font.Font(None, 17)
         
-        # Lichess-inspired colors
-        self.bg_color = (37, 36, 34)  # Dark brown
-        self.text_color = (189, 176, 153)  # Light tan
-        self.move_num_color = (128, 120, 105)  # Muted tan
-        self.highlight_color = (80, 70, 55)  # Subtle highlight
-        self.hover_color = (60, 55, 45)  # Hover effect
+        # Lichess-inspired colors (lighter for better visibility)
+        self.bg_color = (48, 46, 44)  # Lighter brown
+        self.text_color = (220, 210, 195)  # Brighter tan
+        self.move_num_color = (160, 150, 135)  # Lighter muted tan
+        self.highlight_color = (90, 85, 70)  # More visible highlight
+        self.hover_color = (75, 70, 60)  # Hover effect
         
         self.visible = True
         self.scroll_offset = 0
