@@ -12,7 +12,7 @@
       "active_border": "#1a2634"
     },
     "font": {
-      "name": "fira_code",
+      "name": "consolas",
       "size": "14",
       "bold": "1"
     },
@@ -128,7 +128,7 @@
       "normal_text": "#1a1a1a"
     },
     "font": {
-      "name": "fira_code",
+      "name": "consolas",
       "size": "32",
       "bold": "1"
     },
@@ -144,7 +144,7 @@
       "normal_text": "#f0f0f0"
     },
     "font": {
-      "name": "fira_code",
+      "name": "consolas",
       "size": "32",
       "bold": "1"
     },

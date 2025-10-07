@@ -14,6 +14,7 @@ Optimized evaluation function with:
 
 import chess
 import chess.syzygy
+import os
 
 # Piece values
 PIECE_VALUES = {
@@ -139,11 +140,14 @@ PST_EG = {
 
 # Load Syzygy tablebases
 try:
-    syzygy_path = r'R:\TDMU\KIEN_THUC_TDMU\3_year_HK2\TriTueNT\chess-ai\syzygy'
-    tablebase = chess.syzygy.open_tablebase(syzygy_path)
-except:
+    syzygy_path = os.path.join(os.path.dirname(__file__), "..", "..", "syzygy")
+    syzygy_path = os.path.abspath(syzygy_path)
+    if os.path.exists(syzygy_path):
+        tablebase = chess.syzygy.open_tablebase(syzygy_path)
+    else:
+        tablebase = None
+except Exception:
     tablebase = None
-    print("Warning: Syzygy tablebase not found. Endgame tablebases disabled.")
 
 
 class EvaluationCache:

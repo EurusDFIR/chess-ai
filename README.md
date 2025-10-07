@@ -15,7 +15,7 @@
 
 **[⬇️ TẢI NGAY](https://github.com/EurusDFIR/chess-ai/releases/latest/download/ChessAI-Portable-v2.1.zip)** (354 MB)
 
-*Không cần cài Python! • Giải nén và chạy • Hoàn toàn offline*
+_Không cần cài Python! • Giải nén và chạy • Hoàn toàn offline_
 
 **[📋 Hướng dẫn chi tiết](HUONG_DAN_TAI.md)** | **[📝 Release Notes](RELEASE_NOTES.md)** | **[🎮 Tất cả phiên bản](https://github.com/EurusDFIR/chess-ai/releases)**
 
@@ -24,29 +24,34 @@
 ## ✨ TÍNH NĂNG NỔI BẬT
 
 ### 🧠 Chế độ phân tích (v2.1.0)
+
 - Phân tích vị trí real-time với AI
 - Gợi ý nước đi tốt nhất
 - Đánh giá chất lượng nước đi (!! → ??)
 - Hiển thị 3 nước đi thay thế
 
 ### 🎨 Giao diện Lichess-style
+
 - Thiết kế chuyên nghiệp, dễ nhìn
 - Màu sắc brown/tan tối ưu
 - Hiển thị nước đi hợp lệ (chấm xanh)
 - Lịch sử nước đi 2 cột compact
 
 ### 📖 Opening Books
+
 - 12 cơ sở khai cuộc chuyên nghiệp
 - Komodo, GM2600, Performance
 - Tự động chọn nước đi từ sách
 - Hiển thị tên khai cuộc + ECO code
 
 ### ♟️ Endgame Tablebases
+
 - 538 files Syzygy tablebase
 - Chơi tàn cuộc hoàn hảo (3-7 quân)
 - Tự động probe khi phù hợp
 
 ### 🤖 AI mạnh
+
 - Minimax với alpha-beta pruning (C++)
 - Độ sâu tìm kiếm 2-4 nước (configurable)
 - ~100,000 nodes/giây
@@ -60,7 +65,7 @@
 
 **Bước 1:** [Tải file ZIP](https://github.com/EurusDFIR/chess-ai/releases/latest)  
 **Bước 2:** Giải nén vào thư mục bất kỳ  
-**Bước 3:** Chạy `ChessAI-EuryEngine.exe`  
+**Bước 3:** Chạy `ChessAI-EuryEngine.exe`
 
 ⚠️ **Windows SmartScreen cảnh báo?** → Click "More info" → "Run anyway"
 
@@ -88,12 +93,14 @@ python build_release.py
 ## 💻 YÊU CẦU HỆ THỐNG
 
 ### Cho người dùng (executable)
+
 - **OS**: Windows 10/11 (64-bit)
 - **RAM**: 512 MB (khuyên dùng 2GB)
 - **Ổ cứng**: 400 MB trống
 - **Python**: ❌ Không cần cài!
 
 ### Cho developer (source code)
+
 - **Python**: 3.12+ (khuyên dùng 3.12.4)
 - **OS**: Windows/Linux/MacOS
 - **RAM**: 2GB+
@@ -103,18 +110,18 @@ python build_release.py
 
 ## 🎮 ĐIỀU KHIỂN GAME
 
-| Thao tác | Cách làm |
-|----------|----------|
-| **Di chuyển quân** | Click quân → Click ô đích |
-| **Kéo thả** | Giữ chuột trái + kéo |
-| **Vẽ mũi tên** | Chuột phải + kéo |
-| **Highlight ô** | Click chuột phải |
-| **Hủy chọn** | Nhấn ESC hoặc click ô trống |
+| Thao tác            | Cách làm                     |
+| ------------------- | ---------------------------- |
+| **Di chuyển quân**  | Click quân → Click ô đích    |
+| **Kéo thả**         | Giữ chuột trái + kéo         |
+| **Vẽ mũi tên**      | Chuột phải + kéo             |
+| **Highlight ô**     | Click chuột phải             |
+| **Hủy chọn**        | Nhấn ESC hoặc click ô trống  |
 | **Toggle Analysis** | Click "Analysis" hoặc phím A |
-| **Đầu hàng** | Click "Resign" hoặc Ctrl+R |
-| **Xin hòa** | Click "Draw" hoặc Ctrl+D |
-| **Ván mới** | Click "Rematch" hoặc Ctrl+N |
-| **Về menu** | Click "Home" hoặc ESC |
+| **Đầu hàng**        | Click "Resign" hoặc Ctrl+R   |
+| **Xin hòa**         | Click "Draw" hoặc Ctrl+D     |
+| **Ván mới**         | Click "Rematch" hoặc Ctrl+N  |
+| **Về menu**         | Click "Home" hoặc ESC        |
 
 📖 **[Hướng dẫn điều khiển đầy đủ](GAME_CONTROLS_GUIDE.md)**
 
@@ -123,12 +130,15 @@ python build_release.py
 ## 📸 SCREENSHOTS
 
 ### Giao diện chính v2.1
+
 ![Main UI](img_1.png)
 
 ### Chế độ phân tích
+
 ![Analysis Mode](img_2.png)
 
 ### Home Screen
+
 ![Home Screen](img_3.png)
 
 ---
@@ -136,6 +146,7 @@ python build_release.py
 ## 🆕 CHANGELOG v2.1.0
 
 ### Thêm mới
+
 - ✅ **Game Analysis Mode** - Phân tích real-time
 - ✅ **Evaluation Bar** - Thanh đánh giá vị trí
 - ✅ **Move Annotations** - Đánh giá nước đi (!! → ??)
@@ -144,6 +155,7 @@ python build_release.py
 - ✅ **Syzygy Tables** - 538 endgame files
 
 ### Sửa lỗi
+
 - ✅ Board sync trong analysis mode
 - ✅ UIScrollBar crash
 - ✅ Evaluation bar calculation
@@ -188,6 +200,7 @@ python build_release.py
 ```
 
 **Tech Stack:**
+
 - **Frontend**: Pygame CE + pygame_gui
 - **Backend**: python-chess
 - **AI**: C++ minimax (Python binding)
@@ -200,17 +213,20 @@ python build_release.py
 ## 📚 TÀI LIỆU
 
 ### Cho người dùng
+
 - 📖 [HUONG_DAN_TAI.md](HUONG_DAN_TAI.md) - Hướng dẫn tải và cài đặt
 - 🎮 [GAME_CONTROLS_GUIDE.md](GAME_CONTROLS_GUIDE.md) - Điều khiển game
 - 🚀 [QUICK_START.md](QUICK_START.md) - Bắt đầu nhanh
 
 ### Cho developer
+
 - 🏗️ [HYBRID_ARCHITECTURE.md](HYBRID_ARCHITECTURE.md) - Kiến trúc hệ thống
 - 🎨 [GUI_IMPROVEMENTS.md](GUI_IMPROVEMENTS.md) - Cải tiến UI/UX
 - 🔨 [BUILD_GUIDE.md](BUILD_GUIDE.md) - Build C++ engine
 - ⚙️ [CPP_IMPLEMENTATION_GUIDE.md](CPP_IMPLEMENTATION_GUIDE.md) - C++ implementation
 
 ### Release notes
+
 - 📝 [RELEASE_NOTES.md](RELEASE_NOTES.md) - Chi tiết v2.1.0
 - 📊 [OPTIMIZATION_REPORT.md](OPTIMIZATION_REPORT.md) - Performance analysis
 
@@ -222,6 +238,7 @@ python build_release.py
 <summary><strong>Q: Tại sao file .exe lớn 98 MB?</strong></summary>
 
 **A:** File chứa:
+
 - Python 3.12 runtime đầy đủ (40MB)
 - Pygame CE + pygame_gui (25MB)
 - python-chess library (10MB)
@@ -231,12 +248,14 @@ python build_release.py
 - Syzygy tablebases (3MB compressed)
 
 Lợi ích: Không cần cài Python, chạy ngay!
+
 </details>
 
 <details>
 <summary><strong>Q: Game có virus/malware không?</strong></summary>
 
-**A:** Hoàn toàn KHÔNG! 
+**A:** Hoàn toàn KHÔNG!
+
 - Code nguồn mở 100% tại GitHub
 - Build bằng PyInstaller (official tool)
 - Không kết nối internet
@@ -244,12 +263,14 @@ Lợi ích: Không cần cài Python, chạy ngay!
 - Có thể kiểm tra code trước khi build
 
 Windows SmartScreen cảnh báo vì app chưa được Microsoft ký số ($300/năm).
+
 </details>
 
 <details>
 <summary><strong>Q: Có thể chơi offline không?</strong></summary>
 
 **A:** Có! Game hoàn toàn offline:
+
 - Không cần internet khi chơi
 - Opening books đã tích hợp sẵn
 - Tablebases cũng offline
@@ -259,30 +280,35 @@ Windows SmartScreen cảnh báo vì app chưa được Microsoft ký số ($300/
 <details>
 <summary><strong>Q: Tại sao Analysis Mode chậm lần đầu?</strong></summary>
 
-**A:** 
+**A:**
+
 - Lần đầu: AI đang "khởi động" cache → 2-3 giây
 - Từ lần 2: Dùng cache → < 1 giây
 - Cache lưu 1000 positions (LRU)
 
 Tip: Để Analysis Mode bật liên tục để cache warm-up.
+
 </details>
 
 <details>
 <summary><strong>Q: AI mạnh cỡ nào?</strong></summary>
 
-**A:** 
+**A:**
+
 - **Easy** (~1200 Elo) - Người mới chơi
 - **Medium** (~1500 Elo) - Trung bình
 - **Hard** (~1800 Elo) - Khá mạnh
 - **Expert** (~2000 Elo) - Rất mạnh
 
 Với opening books + tablebases, AI có thể đạt 2200+ Elo trong một số vị trí.
+
 </details>
 
 <details>
 <summary><strong>Q: Có bản MacOS/Linux không?</strong></summary>
 
 **A:** Hiện tại chỉ Windows 64-bit. Nhưng có thể:
+
 - Chạy từ source code trên Mac/Linux (cần Python)
 - Build từ source bằng PyInstaller
 - Sắp tới sẽ có cross-platform build
@@ -294,12 +320,14 @@ cd chess-ai
 pip install -r requirements.txt
 python -m src.gui.main_window_v2
 ```
+
 </details>
 
 <details>
 <summary><strong>Q: Làm sao báo lỗi?</strong></summary>
 
-**A:** 
+**A:**
+
 1. Vào: https://github.com/EurusDFIR/chess-ai/issues
 2. Click "New Issue"
 3. Cung cấp:
@@ -307,13 +335,14 @@ python -m src.gui.main_window_v2
    - Mô tả lỗi chi tiết
    - Screenshot (nếu có)
    - Các bước tái hiện lỗi
-</details>
+   </details>
 
 ---
 
 ## 🛠️ DEVELOPMENT
 
 ### Setup môi trường
+
 ```bash
 # Clone repo
 git clone https://github.com/EurusDFIR/chess-ai.git
@@ -332,6 +361,7 @@ python -m src.gui.main_window_v2
 ```
 
 ### Build executable
+
 ```bash
 # Option 1: Use build script
 python build_release.py
@@ -347,6 +377,7 @@ pyinstaller --name=ChessAI-EuryEngine \
 ```
 
 ### Project structure
+
 ```
 chess-ai/
 ├── src/
@@ -374,6 +405,7 @@ chess-ai/
 ```
 
 ### Testing
+
 ```bash
 # Run tests
 python -m pytest tests/
@@ -392,6 +424,7 @@ python benchmark_engines.py
 Contributions welcome! 🎉
 
 ### Cách contribute
+
 1. **Fork** repo này
 2. **Clone** fork của bạn: `git clone https://github.com/YOUR_USERNAME/chess-ai.git`
 3. **Tạo branch**: `git checkout -b feature/TinhNangMoi`
@@ -400,6 +433,7 @@ Contributions welcome! 🎉
 6. **Tạo Pull Request** trên GitHub
 
 ### Ý tưởng cho contributor
+
 - [ ] MacOS/Linux build
 - [ ] Online multiplayer
 - [ ] Puzzle mode
@@ -434,6 +468,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
 ```
 
 **Tóm tắt:**
+
 - ✅ Sử dụng miễn phí (cá nhân, thương mại)
 - ✅ Sửa đổi tùy ý
 - ✅ Phân phối lại
@@ -445,9 +480,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
 ## 🐛 BÁO LỖI & HỖ TRỢ
 
 ### Tìm thấy lỗi?
+
 **[🔴 Tạo Issue](https://github.com/EurusDFIR/chess-ai/issues/new)**
 
 **Thông tin cần cung cấp:**
+
 - Windows version (10/11, 64-bit?)
 - Python version (nếu chạy từ source)
 - Mô tả lỗi chi tiết
@@ -455,6 +492,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
 - Các bước tái hiện
 
 ### Cần hỗ trợ?
+
 - 📧 **Email**: (thêm email nếu muốn)
 - 💬 **GitHub Discussions**: https://github.com/EurusDFIR/chess-ai/discussions
 - 🐛 **Issues**: https://github.com/EurusDFIR/chess-ai/issues
@@ -476,18 +514,21 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
 ## 🙏 CẢM ƠN & CREDIT
 
 ### Libraries & Frameworks
+
 - **[python-chess](https://python-chess.readthedocs.io/)** - Niklaus Fiekas - Chess logic và move generation
 - **[Pygame CE](https://pyga.me/)** - Pygame Community - Graphics engine
 - **[pygame_gui](https://pygame-gui.readthedocs.io/)** - Dan Lawrence - UI framework
 - **[PyInstaller](https://pyinstaller.org/)** - PyInstaller Team - Executable builder
 
 ### Resources
+
 - **[Syzygy Tablebases](https://syzygy-tables.info/)** - Ronald de Man - Endgame tablebases
 - **[Polyglot Opening Books](http://hgm.nubati.net/book_format.html)** - Fabien Letouzey - Opening book format
 - **[Lichess](https://lichess.org/)** - UI design inspiration
 - **[Chess Programming Wiki](https://www.chessprogramming.org/)** - Chess AI resources
 
 ### Special Thanks
+
 - 🎓 **TDMU** - Đại học Thủ Dầu Một
 - 👨‍🏫 **Giảng viên môn AI** - Hướng dẫn và support
 - 🧑‍💻 **Contributors** - Tất cả những người đóng góp code
@@ -526,15 +567,16 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
 ---
 
 **⭐ Nếu thích project này, hãy cho 1 star trên GitHub! ⭐**
-│   │   ├── components/          # NEW: Modular widgets
-│   │   ├── main_window_v2.py    # NEW: Refactored main
-│   │   ├── main_window.py       # Old version
-│   │   └── theme_improved.json  # NEW: Better theme
-│   ├── ai/                      # AI algorithms
-│   └── engine_cpp/              # C++ engine (optional)
-├── docs/                        # NEW: Documentation folder
-├── opening_bin/                 # Opening books
+│ │ ├── components/ # NEW: Modular widgets
+│ │ ├── main_window_v2.py # NEW: Refactored main
+│ │ ├── main_window.py # Old version
+│ │ └── theme_improved.json # NEW: Better theme
+│ ├── ai/ # AI algorithms
+│ └── engine_cpp/ # C++ engine (optional)
+├── docs/ # NEW: Documentation folder
+├── opening_bin/ # Opening books
 └── requirements.txt
+
 ```
 
 ## 🐛 Changelog
@@ -558,12 +600,13 @@ MIT License
 
 ## 👨‍💻 Author
 
-**Eurus-Infosec**
+**EurusDFIR**
 
-- GitHub: [@Eurus-Infosec](https://github.com/Eurus-Infosec)
+- GitHub: [@EurusDFIR](https://github.com/EurusDFIR)
 
 ---
 
 ⭐ **Star this repo if you like it!**
 
 See [README_V2.md](README_V2.md) for detailed documentation.
+```

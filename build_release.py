@@ -93,9 +93,15 @@ def create_portable_package():
         zipf.write("LICENSE", "LICENSE")
         zipf.write("docs/QUICK_START.md", "docs/QUICK_START.md")
         
-        # Add opening books (optional)
+        # Add opening books
         for book in Path("opening_bin").glob("*.bin"):
             zipf.write(book, f"opening_bin/{book.name}")
+        
+        # Add syzygy tablebases
+        for tablebase in Path("syzygy").glob("*.rtbw"):
+            zipf.write(tablebase, f"syzygy/{tablebase.name}")
+        for tablebase in Path("syzygy").glob("*.rtbz"):
+            zipf.write(tablebase, f"syzygy/{tablebase.name}")
     
     print(f"✅ Created: {zip_name}")
     return zip_name

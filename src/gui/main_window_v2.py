@@ -311,9 +311,9 @@ class ChessGame:
                 pygame.mixer.music.load(music_path)
                 pygame.mixer.music.play(-1)
                 pygame.mixer.music.set_volume(0.3)
-                print("🎵 Music loaded")
+                print("[Music] Background music loaded")
             except:
-                print("⚠️ Could not load music")
+                print("[Warning] Could not load music")
     
     def start_game(self):
         """Start a new game"""
@@ -602,9 +602,8 @@ class ChessGame:
             return False
         
         # UI events
-        if event.type == pygame.USEREVENT:
-            if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
-                self._handle_button_press(event.ui_element)
+        if event.type == pygame_gui.UI_BUTTON_PRESSED:
+            self._handle_button_press(event.ui_element)
         
         # Analysis panel events
         if self.analysis_mode and self.analysis_panel.handle_event(event):

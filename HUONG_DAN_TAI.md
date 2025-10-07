@@ -3,31 +3,37 @@
 ## 📥 CÁCH 1: TẢI TỪ GITHUB (KHUYÊN DÙNG)
 
 ### Bước 1: Vào trang tải
+
 🔗 **Link:** https://github.com/EurusDFIR/chess-ai/releases/latest
 
 ### Bước 2: Tải file
+
 - Kéo xuống phần **Assets**
 - Click vào: **ChessAI-Portable-v2.1.zip** (354 MB)
 - Đợi tải xong (mất 5-10 phút tùy mạng)
 
 ### Bước 3: Giải nén
+
 1. Click phải vào file `ChessAI-Portable-v2.1.zip`
 2. Chọn **"Extract All..."** (hoặc "Giải nén tất cả...")
 3. Chọn thư mục muốn giải nén (VD: `C:\Games\ChessAI`)
 4. Click **Extract**
 
 ### Bước 4: Chạy game
+
 1. Vào thư mục vừa giải nén
 2. Double-click file: **ChessAI-EuryEngine.exe**
 3. Chơi!
 
 ### ⚠️ Windows SmartScreen cảnh báo?
+
 **Nếu xuất hiện cảnh báo "Windows protected your PC":**
 
 1. Click **"More info"** (Thông tin thêm)
 2. Click **"Run anyway"** (Vẫn chạy)
 
 **Tại sao?**
+
 - App chưa được Microsoft ký số (cần $300/năm)
 - Hoàn toàn an toàn, code nguồn mở tại GitHub
 
@@ -36,9 +42,11 @@
 ## 📥 CÁCH 2: TẢI TỪ GOOGLE DRIVE
 
 ### Link tải:
+
 🔗 **[Nhấn vào đây để tải](link-drive-của-bạn)**
 
 ### Các bước giống như trên:
+
 1. Tải file ZIP từ Drive
 2. Giải nén
 3. Chạy file .exe
@@ -57,6 +65,7 @@
 ## 🎮 HƯỚNG DẪN CHƠI
 
 ### Bắt đầu game mới
+
 1. Click **"New Game"**
 2. Chọn **"vs AI"** (chơi với máy) hoặc **"vs Human"** (2 người)
 3. Chọn độ khó:
@@ -65,17 +74,19 @@
    - **Hard** - Khó (AI suy nghĩ lâu hơn)
 
 ### Điều khiển
-| Thao tác | Cách làm |
-|----------|----------|
+
+| Thao tác           | Cách làm                     |
+| ------------------ | ---------------------------- |
 | **Di chuyển quân** | Click quân cờ → Click ô đích |
-| **Kéo thả** | Giữ chuột + kéo quân |
-| **Hủy chọn** | Nhấn ESC hoặc click ô trống |
-| **Phân tích** | Click nút "Analysis" |
-| **Đầu hàng** | Click "Resign" |
-| **Hòa** | Click "Draw" |
-| **Ván mới** | Click "Rematch" |
+| **Kéo thả**        | Giữ chuột + kéo quân         |
+| **Hủy chọn**       | Nhấn ESC hoặc click ô trống  |
+| **Phân tích**      | Click nút "Analysis"         |
+| **Đầu hàng**       | Click "Resign"               |
+| **Hòa**            | Click "Draw"                 |
+| **Ván mới**        | Click "Rematch"              |
 
 ### Chế độ phân tích (Analysis Mode)
+
 1. Click nút **"Analysis"** (màu xanh)
 2. Xem:
    - **Thanh đánh giá** (trắng thắng/đen thắng)
@@ -91,28 +102,36 @@
 ## ❓ GIẢI ĐÁP THẮC MẮC
 
 ### Q: Tại sao file .exe quá lớn (98 MB)?
+
 **A:** File chứa:
+
 - Toàn bộ Python runtime
 - Chess engine (AI)
 - 12 opening books (cơ sở khai cuộc)
 - 538 endgame tablebases (cơ sở tàn cuộc)
 
 ### Q: Game chạy chậm?
-**A:** 
+
+**A:**
+
 - Tắt Analysis Mode (giảm tải CPU)
 - Giảm độ khó xuống Easy
 - Đóng các app khác
 
 ### Q: Tại sao lần đầu Analysis Mode chậm?
+
 **A:** Do AI đang "khởi động" cache. Từ lần 2 sẽ nhanh hơn.
 
 ### Q: Có thể chơi offline không?
+
 **A:** Có! Game hoàn toàn offline, không cần internet.
 
 ### Q: Game có virus không?
+
 **A:** Không! Code nguồn mở tại GitHub, kiểm tra được.
 
 ### Q: Có bản MacOS/Linux không?
+
 **A:** Chưa có. Hiện tại chỉ Windows 64-bit.
 
 ---
@@ -123,6 +142,7 @@ Gặp lỗi? Hãy báo tại:
 🔗 https://github.com/EurusDFIR/chess-ai/issues
 
 **Thông tin cần cung cấp:**
+
 1. Windows version (Win 10/11)
 2. Mô tả lỗi chi tiết
 3. Screenshot (nếu có)
@@ -144,4 +164,4 @@ MIT License - Miễn phí sử dụng, sửa đổi, phân phối.
 
 **Chúc bạn chơi vui! ♟️🎮**
 
-*Phát triển bởi Eury Engine Team - Sinh viên TDMU*
+_Phát triển bởi Eury Engine Team - Sinh viên TDMU_
