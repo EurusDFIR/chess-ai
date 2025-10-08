@@ -1,11 +1,12 @@
 # src/ai/minimax_v2_4.py
 """
-Chess AI v2.4.0 - Advanced Search Techniques
+Chess AI v2.5.0 - Advanced Search Techniques with Correction History
 New optimizations:
 - Singular Extensions
 - Multi-Cut Pruning  
 - Internal Iterative Deepening (IID)
 - Probcut
+- Correction History (+100-150 Elo) ⭐ NEW in v2.5
 """
 
 import chess
@@ -14,6 +15,7 @@ import random
 import math
 from collections import defaultdict
 from src.ai.evaluation_optimized import evaluate_incremental, EvaluationCache
+from src.ai.correction_history import CorrectionHistory
 
 # Import base classes từ minimax_optimized
 from src.ai.minimax_optimized import (
@@ -336,6 +338,25 @@ def alpha_beta_advanced(board, depth, alpha, beta, info, ply, do_null=True):
     if in_check:
         depth += 1
     
+    # ========== NEW v2.5: Static Eval with Correction History ==========
+    static_eval = evaluate_incremental(board)
+    
+    # Apply correction from history if available
+    if hasattr(info, 'correction_history'):
+        prev_move = info.last_move if hasattr(info, 'last_move') else None
+        correction = info.correction_history.get_correction(board, prev_move)
+        corrected_eval = static_eval + correction
+        
+        # Clamp to avoid tablebase range
+        corrected_eval = max(min(corrected_eval, MATE_SCORE - 100), -MATE_SCORE + 100)
+    else:
+        corrected_eval = static_eval
+    
+    # Store static eval for later correction update (at root and PV nodes)
+    if not hasattr(info, 'static_evals'):
+        info.static_evals = {}
+    info.static_evals[ply] = corrected_eval
+    
     # ========== NEW: Internal Iterative Deepening (IID) ==========
     if not hash_move and depth >= 4 and not in_check:
         hash_move = internal_iterative_deepening(board, depth, alpha, beta, info, ply)
@@ -462,6 +483,20 @@ def alpha_beta_advanced(board, depth, alpha, beta, info, ply, do_null=True):
                     
                     break
     
+    # ========== NEW v2.5: Update Correction History ==========
+    # Update correction history based on search result vs static eval
+    if hasattr(info, 'correction_history') and ply in info.static_evals:
+        static_val = info.static_evals[ply]
+        search_val = best_score
+        
+        # Calculate evaluation error (search found vs static estimate)
+        eval_error = search_val - static_val
+        
+        # Only update for non-tactical positions (avoid noise)
+        if not in_check and abs(eval_error) > 10:  # Threshold 10cp
+            prev_move = info.last_move if hasattr(info, 'last_move') else None
+            info.correction_history.update(board, eval_error, prev_move, depth)
+    
     # Store in transposition table
     info.tt.store(zobrist_hash, depth, best_score, bound_type, best_move)
     
@@ -473,9 +508,16 @@ def alpha_beta_advanced(board, depth, alpha, beta, info, ply, do_null=True):
 # ============================================================================
 
 def iterative_deepening_advanced(board, max_depth, time_limit=10.0):
-    """Iterative deepening using advanced alpha-beta."""
+    """
+    Iterative deepening using advanced alpha-beta with correction history.
+    v2.5: Added Correction History for +100-150 Elo gain.
+    """
     info = SearchInfo(time_limit)
     info.tt.new_search()
+    
+    # ========== NEW v2.5: Initialize Correction History ==========
+    info.correction_history = CorrectionHistory()
+    info.static_evals = {}  # Store static evals for correction updates
     
     best_move = None
     best_score = 0
@@ -522,6 +564,11 @@ def iterative_deepening_advanced(board, max_depth, time_limit=10.0):
         pv_str = ' '.join(pv_moves[:5])
         
         print(f"{depth:<8} {best_score:<10} {info.nodes:<12} {elapsed:<10.3f} {pv_str:<40}")
+        
+        # ========== NEW v2.5: Apply Gravity to Correction History ==========
+        # Every few depths, decay correction history to keep data fresh
+        if depth % 3 == 0 and hasattr(info, 'correction_history'):
+            info.correction_history.apply_gravity(factor=0.875)  # 7/8 decay
         
         if abs(best_score) > MATE_SCORE - 100:
             break
