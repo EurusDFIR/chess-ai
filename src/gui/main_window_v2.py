@@ -285,6 +285,11 @@ class ChessGame:
             object_id=pygame_gui.core.ObjectID(class_id='@home_button')
         )
         
+        # Make buttons semi-transparent to show background
+        self.play_button.image.set_alpha(200)
+        self.settings_button.image.set_alpha(200)
+        self.about_button.image.set_alpha(200)
+        
         self.home_buttons = [
             self.title_label,
             self.play_button,
