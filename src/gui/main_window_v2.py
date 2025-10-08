@@ -245,15 +245,17 @@ class ChessGame:
             object_id=pygame_gui.core.ObjectID(class_id='@title_label')
         )
         
-        button_width = 280
-        button_height = 55
-        start_y = 180
-        spacing = 75
+        # Smaller buttons, positioned at bottom-right to not obscure background
+        button_width = 200
+        button_height = 45
+        start_x = WINDOW_WIDTH - 220  # Right side
+        start_y = WINDOW_HEIGHT - 200  # Bottom area
+        spacing = 55
         
         # Play button
         self.play_button = pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect(
-                (WINDOW_WIDTH//2 - button_width//2, start_y),
+                (start_x, start_y),
                 (button_width, button_height)
             ),
             text='Play vs AI',
@@ -264,7 +266,7 @@ class ChessGame:
         # Settings button
         self.settings_button = pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect(
-                (WINDOW_WIDTH//2 - button_width//2, start_y + spacing),
+                (start_x, start_y + spacing),
                 (button_width, button_height)
             ),
             text='Settings',
@@ -275,7 +277,7 @@ class ChessGame:
         # About button
         self.about_button = pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect(
-                (WINDOW_WIDTH//2 - button_width//2, start_y + spacing * 2),
+                (start_x, start_y + spacing * 2),
                 (button_width, button_height)
             ),
             text='About',
