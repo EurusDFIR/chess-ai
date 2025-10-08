@@ -7,6 +7,7 @@
 ### **What Was Done:**
 
 1. **Created Correction History Module** ([`src/ai/correction_history.py`](src/ai/correction_history.py))
+
    - Tracks evaluation errors across multiple dimensions
    - Pawn structure corrections
    - Minor piece corrections
@@ -15,6 +16,7 @@
    - Gravity system for data freshness
 
 2. **Integrated into v2.4 → v2.5** ([`src/ai/minimax_v2_4.py`](src/ai/minimax_v2_4.py))
+
    - Added correction history import
    - Initialize CorrectionHistory in iterative deepening
    - Apply corrections to static eval during search
@@ -39,6 +41,7 @@ TEST 4: Tactical Positions Test         ✅ PASSED
 ```
 
 ### **Example Output:**
+
 - Position: Scholar's Mate Defense
 - Best move: Nc3 (correct development)
 - Nodes searched: 10,331
@@ -46,6 +49,7 @@ TEST 4: Tactical Positions Test         ✅ PASSED
 - **Correction applied successfully**
 
 ### **Correction Example:**
+
 - Static eval: 50cp
 - Search found: 150cp
 - Eval error: 100cp (underestimate)
@@ -55,6 +59,7 @@ TEST 4: Tactical Positions Test         ✅ PASSED
 ## 🎯 **Expected Impact:**
 
 Based on Stockfish analysis:
+
 - **Elo Gain**: +100-150 Elo
 - **Current v2.4**: ~2200-2300 Elo
 - **Expected v2.5**: ~2300-2450 Elo
@@ -64,12 +69,14 @@ Based on Stockfish analysis:
 ### **How It Works:**
 
 1. **During Search:**
+
    - Get static eval from evaluation function
    - Query correction history for adjustments
    - Apply correction: `corrected_eval = static_eval + correction`
    - Use corrected eval for pruning decisions
 
 2. **After Search:**
+
    - Compare search result vs static eval
    - Calculate error: `eval_error = search_score - static_eval`
    - Update correction tables with scaled bonus
@@ -88,6 +95,7 @@ Based on Stockfish analysis:
 4. **Continuation Correction** (by move sequence)
 
 **Weights** (inspired by Stockfish):
+
 - Pawn: 100x
 - Minor: 80x
 - Non-pawn: 100x
@@ -97,6 +105,7 @@ Based on Stockfish analysis:
 ## 📈 **Next Steps:**
 
 ### **Immediate (Complete v2.5):**
+
 1. ✅ **DONE**: Implement Correction History
 2. ⏳ **TODO**: Benchmark v2.5 vs v2.4
    - Run 100+ games
@@ -108,7 +117,9 @@ Based on Stockfish analysis:
    - Fine-tune thresholds
 
 ### **Phase 2 (v2.6):**
+
 After confirming v2.5 gains, add:
+
 - Enhanced Late Move Pruning (+40-60 Elo)
 - Razoring (+30-50 Elo)
 - Continuation History (+40-60 Elo)
@@ -116,12 +127,14 @@ After confirming v2.5 gains, add:
 **Total v2.6 Target**: ~2500-2600 Elo
 
 ### **Future (v3.0):**
+
 - NNUE Evaluation (+400-600 Elo)
 - Target: 2800-3000 Elo (Grandmaster level)
 
 ## 🚀 **How to Use v2.5:**
 
 ### **Python Script:**
+
 ```python
 from src.ai.minimax_v2_4 import get_best_move
 import chess
@@ -132,11 +145,13 @@ print(f"Best move: {move}")
 ```
 
 ### **GUI:**
+
 - Already integrated in `main_window_v2.py`
 - No changes needed
 - Correction history works automatically
 
 ### **Test:**
+
 ```bash
 python test_correction_history_integration.py
 ```
@@ -144,7 +159,9 @@ python test_correction_history_integration.py
 ## 📝 **Code Changes Summary:**
 
 ### **Files Modified:**
+
 1. **`src/ai/minimax_v2_4.py`**:
+
    - Added correction history import
    - Updated version to v2.5
    - Added correction application in alpha-beta search
@@ -157,6 +174,7 @@ python test_correction_history_integration.py
    - `EURY_v2.5_IMPROVEMENTS.md` (documentation)
 
 ### **Lines of Code:**
+
 - Total added: ~400 lines
 - Correction History module: 260 lines
 - Integration code: ~50 lines
@@ -180,4 +198,3 @@ python test_correction_history_integration.py
 **Prepared by**: AI Assistant (Copilot)  
 **Date**: October 8, 2025  
 **Status**: ✅ READY FOR TESTING
-
