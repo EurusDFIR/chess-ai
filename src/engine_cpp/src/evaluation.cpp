@@ -24,7 +24,15 @@ Score Evaluator::evaluate(const Board &board)
     score += evaluateMobility(board);
     score += evaluateThreats(board);
 
-    // Return score from white's perspective
+    // NEW: Opening principles (Python v2.3.0)
+    score += evaluateOpeningPrinciples(board);
+
+    // NEW: Endgame and special positions
+    score += evaluateEndgame(board);
+    score += evaluateRookOnOpenFile(board);
+
+    // Return score from SIDE TO MOVE's perspective for negamax
+    // Negamax expects each node to return score from current player's POV
     Color side = board.getSideToMove();
     return side == WHITE ? score : -score;
 }
@@ -184,58 +192,36 @@ Score Evaluator::evaluateKingSafety(const Board &board)
 // Evaluate mobility
 Score Evaluator::evaluateMobility(const Board &board)
 {
+    // DISABLED: Legal move counting breaks symmetry with null move approach
+    // TODO: Implement proper caching or use different approach
+    // For now, return 0 to maintain evaluation stability
+    return 0;
+
+    /* Attempted implementation - causes asymmetry
     Score score = 0;
-    Bitboard occupied = board.getAllOccupied();
+    Color originalSide = board.getSideToMove();
 
-    for (Color c : {WHITE, BLACK})
-    {
-        int sign = (c == WHITE) ? 1 : -1;
-        int mobility = 0;
+    MoveList currentMoves;
+    MoveGenerator::generateLegalMoves(board, currentMoves);
+    int currentMobility = currentMoves.size();
 
-        // Knight mobility
-        Bitboard knights = board.getPieces(c, KNIGHT);
-        while (knights)
-        {
-            Square sq = popLsb(knights);
-            Bitboard attacks = AttackTables::getKnightAttacks(sq);
-            attacks &= ~board.getOccupied(c); // Exclude own pieces
-            mobility += popcount(attacks);
-        }
+    Board tempBoard = board;
+    tempBoard.makeNullMove();
 
-        // Bishop mobility
-        Bitboard bishops = board.getPieces(c, BISHOP);
-        while (bishops)
-        {
-            Square sq = popLsb(bishops);
-            Bitboard attacks = AttackTables::getBishopAttacks(sq, occupied);
-            attacks &= ~board.getOccupied(c);
-            mobility += popcount(attacks);
-        }
+    MoveList opponentMoves;
+    MoveGenerator::generateLegalMoves(tempBoard, opponentMoves);
+    int opponentMobility = opponentMoves.size();
 
-        // Rook mobility
-        Bitboard rooks = board.getPieces(c, ROOK);
-        while (rooks)
-        {
-            Square sq = popLsb(rooks);
-            Bitboard attacks = AttackTables::getRookAttacks(sq, occupied);
-            attacks &= ~board.getOccupied(c);
-            mobility += popcount(attacks);
-        }
+    tempBoard.unmakeNullMove();
 
-        // Queen mobility
-        Bitboard queens = board.getPieces(c, QUEEN);
-        while (queens)
-        {
-            Square sq = popLsb(queens);
-            Bitboard attacks = AttackTables::getQueenAttacks(sq, occupied);
-            attacks &= ~board.getOccupied(c);
-            mobility += popcount(attacks);
-        }
-
-        score += sign * mobility * 2; // 2 centipawns per legal move
+    if (originalSide == WHITE) {
+        score = (currentMobility - opponentMobility) * 1;
+    } else {
+        score = (opponentMobility - currentMobility) * 1;
     }
 
     return score;
+    */
 }
 
 // Evaluate threats
@@ -340,4 +326,226 @@ Score Evaluator::getPSTValue(PieceType pt, Square sq, Color c, int phase)
     }
 
     return sign * interpolateScore(mg, eg, phase);
+}
+
+// ============================================================================
+// NEW: Opening Principles Evaluation (Python v2.3.0)
+// ============================================================================
+
+Score Evaluator::evaluateOpeningPrinciples(const Board &board)
+{
+    // Only apply in opening (first 20 moves)
+    if (board.getFullMoveNumber() > 20)
+        return 0;
+
+    Score score = 0;
+
+    score += evaluateCenterControl(board);
+    score += evaluateDevelopment(board);
+    score += evaluateCastlingRights(board);
+    score += evaluateEarlyQueen(board);
+
+    return score;
+}
+
+Score Evaluator::evaluateCenterControl(const Board &board)
+{
+    Score score = 0;
+
+    // Center squares: e4, d4, e5, d5
+    const Square centerSquares[] = {E4, D4, E5, D5};
+
+    for (Square sq : centerSquares)
+    {
+        PieceType pt = board.pieceTypeAt(sq);
+        Color pc = board.pieceColorAt(sq);
+
+        if (pt == PAWN)
+        {
+            // Pawn in center: +20 (Python value, will be multiplied by 2 later)
+            score += (pc == WHITE) ? 20 : -20;
+        }
+
+        // Control of center squares (Python: +5 per attacker)
+        // Count attackers for each side
+        Bitboard white_attackers = board.getAttackers(sq, WHITE);
+        Bitboard black_attackers = board.getAttackers(sq, BLACK);
+        int white_control = popcount(white_attackers);
+        int black_control = popcount(black_attackers);
+        score += (white_control - black_control) * 5;
+    }
+
+    return score * 2; // Python multiplies center control by 2
+}
+
+Score Evaluator::evaluateDevelopment(const Board &board)
+{
+    Score score = 0;
+
+    for (Color c : {WHITE, BLACK})
+    {
+        int sign = (c == WHITE) ? 1 : -1;
+        int developed = 0;
+        int backRank = (c == WHITE) ? 0 : 7;
+
+        // Knights developed (not on back rank)
+        Bitboard knights = board.getPieces(c, KNIGHT);
+        while (knights)
+        {
+            Square sq = popLsb(knights);
+            if (rankOf(sq) != backRank)
+                developed++;
+        }
+
+        // Bishops developed (not on back rank)
+        Bitboard bishops = board.getPieces(c, BISHOP);
+        while (bishops)
+        {
+            Square sq = popLsb(bishops);
+            if (rankOf(sq) != backRank)
+                developed++;
+        }
+
+        // +15 per developed piece (will be multiplied by 2 in evaluateOpeningPrinciples)
+        score += sign * developed * 15;
+    }
+
+    return score * 2; // Python multiplies development by 2
+}
+
+Score Evaluator::evaluateCastlingRights(const Board &board)
+{
+    Score score = 0;
+
+    // Bonus for having castling rights
+    if (board.getCastlingRights() & (WHITE_OO | WHITE_OOO))
+        score += 30;
+    if (board.getCastlingRights() & (BLACK_OO | BLACK_OOO))
+        score -= 30;
+
+    return score;
+}
+
+Score Evaluator::evaluateEarlyQueen(const Board &board)
+{
+    // Only check in first 10 moves
+    if (board.getFullMoveNumber() > 10)
+        return 0;
+
+    Score score = 0;
+
+    for (Color c : {WHITE, BLACK})
+    {
+        int sign = (c == WHITE) ? 1 : -1;
+        int backRank = (c == WHITE) ? 0 : 7;
+
+        Bitboard queens = board.getPieces(c, QUEEN);
+        while (queens)
+        {
+            Square sq = popLsb(queens);
+            if (rankOf(sq) != backRank)
+            {
+                // Queen moved from back rank early = bad (-20)
+                score += sign * (-20);
+            }
+        }
+    }
+
+    return score;
+}
+
+// ============================================================================
+// NEW: Endgame Evaluation
+// ============================================================================
+
+Score Evaluator::evaluateEndgame(const Board &board)
+{
+    int totalPieces = popcount(board.getAllOccupied());
+
+    // Not endgame yet
+    if (totalPieces > 10)
+        return 0;
+
+    Score score = 0;
+
+    // King activity in endgame
+    for (Color c : {WHITE, BLACK})
+    {
+        int sign = (c == WHITE) ? 1 : -1;
+        Square kingSq = board.getKingSquare(c);
+
+        // Centralized king is good in endgame
+        int file = fileOf(kingSq);
+        int rank = rankOf(kingSq);
+        int centerDist = std::abs(file - 3) + std::abs(file - 4) +
+                         std::abs(rank - 3) + std::abs(rank - 4);
+
+        // Closer to center = better
+        score += sign * (14 - centerDist) * 5;
+    }
+
+    return score;
+}
+
+Score Evaluator::evaluateRookOnOpenFile(const Board &board)
+{
+    Score score = 0;
+
+    for (Color c : {WHITE, BLACK})
+    {
+        int sign = (c == WHITE) ? 1 : -1;
+        Bitboard rooks = board.getPieces(c, ROOK);
+
+        while (rooks)
+        {
+            Square sq = popLsb(rooks);
+            int file = fileOf(sq);
+            Bitboard fileBoard = 0x0101010101010101ULL << file;
+
+            // Check if file is open (no pawns)
+            bool open = !(board.getPieces(WHITE, PAWN) & fileBoard) &&
+                        !(board.getPieces(BLACK, PAWN) & fileBoard);
+
+            // Check if semi-open (no own pawns)
+            bool semiOpen = !(board.getPieces(c, PAWN) & fileBoard);
+
+            if (open)
+                score += sign * 25; // Rook on open file
+            else if (semiOpen)
+                score += sign * 15; // Rook on semi-open file
+        }
+    }
+
+    return score;
+}
+
+// ============================================================================
+// DEBUG: Detailed Evaluation Breakdown
+// ============================================================================
+
+Evaluator::EvalBreakdown Evaluator::evaluateDetailed(const Board &board)
+{
+    EvalBreakdown breakdown;
+
+    // Calculate each component
+    breakdown.material = evaluateMaterial(board);
+    breakdown.pst = evaluatePosition(board);
+    breakdown.pawnStructure = evaluatePawnStructure(board);
+    breakdown.kingSafety = evaluateKingSafety(board);
+    breakdown.mobility = evaluateMobility(board);
+    breakdown.threats = evaluateThreats(board);
+    breakdown.openingPrinciples = evaluateOpeningPrinciples(board);
+    breakdown.endgame = evaluateEndgame(board);
+    breakdown.rooksOnOpenFile = evaluateRookOnOpenFile(board);
+
+    // Total (from white's perspective, before flipping for side to move)
+    Score total = breakdown.material + breakdown.pst + breakdown.pawnStructure +
+                  breakdown.kingSafety + breakdown.mobility + breakdown.threats +
+                  breakdown.openingPrinciples + breakdown.endgame + breakdown.rooksOnOpenFile;
+
+    // Flip for side to move
+    Color side = board.getSideToMove();
+    breakdown.total = (side == WHITE) ? total : -total;
+
+    return breakdown;
 }

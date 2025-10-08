@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="R:\_Documents\_TDMU\KIEN_THUC_TDMU\3_year_HK2\TriTueNT\chess-ai\src\engine_cpp\src\board.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="R:\_Documents\_TDMU\KIEN_THUC_TDMU\3_year_HK2\TriTueNT\chess-ai\src\engine_cpp\src\movegen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="R:\_Documents\_TDMU\KIEN_THUC_TDMU\3_year_HK2\TriTueNT\chess-ai\src\engine_cpp\src\evaluation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="R:\_Documents\_TDMU\KIEN_THUC_TDMU\3_year_HK2\TriTueNT\chess-ai\src\engine_cpp\src\search.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="R:\_Documents\_TDMU\KIEN_THUC_TDMU\3_year_HK2\TriTueNT\chess-ai\src\engine_cpp\src\transposition.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="R:\_Documents\_TDMU\KIEN_THUC_TDMU\3_year_HK2\TriTueNT\chess-ai\src\engine_cpp\src\types.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="R:\_Documents\_TDMU\KIEN_THUC_TDMU\3_year_HK2\TriTueNT\chess-ai\src\engine_cpp\src\bindings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="R:\_Documents\_TDMU\KIEN_THUC_TDMU\3_year_HK2\TriTueNT\chess-ai\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{5CB51131-18D4-3BF1-9773-131A1AD50624}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -23,7 +23,7 @@ from src.gui.components.evaluation_bar import EvaluationBar
 from src.gui.components.analysis_panel import AnalysisPanel
 
 # AI
-from src.ai.minimax_optimized import get_best_move
+from src.ai.minimax_fast import get_best_move  # OPTIMIZED: Use fast engine (30-50% faster)
 from src.ai.opening_book import OpeningBook
 from src.ai.analysis_engine import AnalysisEngine
 
@@ -77,7 +77,7 @@ def load_pieces():
 
 
 def ai_move_threaded(board_copy, depth=4, time_limit=5.0):
-    """Run AI in background thread"""
+    """Run AI in background thread - Python engine only"""
     global ai_thinking
     ai_thinking = True
     
@@ -93,10 +93,11 @@ def ai_move_threaded(board_copy, depth=4, time_limit=5.0):
                 except:
                     pass
             
-            # If no book move, use engine
+            # If no book move, use Python engine
             if not move:
-                move = get_best_move(board_copy, depth=depth, time_limit=time_limit)
-                print(f"[AI] Calculated move: {move}")
+                # Fast engine uses max_time instead of time_limit
+                move, info = get_best_move(board_copy, depth=depth, max_time=time_limit)
+                print(f"[Fast Engine] Move: {move} (depth {depth}, nodes: {info['nodes']:,}, nps: {info['nps']:,.0f})")
             
             ai_move_queue.put(move)
         except Exception as e:
@@ -152,12 +153,13 @@ class ChessGame:
         }
         self.selected_time_control = 'Blitz 5+0'
         
-        # AI difficulty
+        # AI difficulty - ENHANCED for stronger Python engine
+        # Format: (depth, time_limit)
         self.ai_levels = {
-            'Easy': (2, 1.0),
-            'Medium': (3, 3.0),
-            'Hard': (4, 5.0),
-            'Expert': (5, 10.0),
+            'Easy': (3, 2.0),      # Increased: depth 2→3
+            'Medium': (4, 5.0),    # Increased: depth 3→4, time 3→5
+            'Hard': (5, 10.0),     # Increased: depth 4→5, time 5→10
+            'Expert': (6, 15.0),   # Increased: depth 5→6, time 10→15
         }
         self.selected_ai_level = 'Hard'
         

@@ -7,8 +7,26 @@
 class Evaluator
 {
 public:
+    // Debug: Evaluation breakdown
+    struct EvalBreakdown
+    {
+        Score material;
+        Score pst;
+        Score pawnStructure;
+        Score kingSafety;
+        Score mobility;
+        Score threats;
+        Score openingPrinciples;
+        Score endgame;
+        Score rooksOnOpenFile;
+        Score total;
+    };
+
     // Main evaluation function
     static Score evaluate(const Board &board);
+
+    // Debug: Detailed evaluation
+    static EvalBreakdown evaluateDetailed(const Board &board);
 
 private:
     // Component evaluations
@@ -18,6 +36,17 @@ private:
     static Score evaluateKingSafety(const Board &board);
     static Score evaluateMobility(const Board &board);
     static Score evaluateThreats(const Board &board);
+
+    // NEW: Opening principles (from Python v2.3.0)
+    static Score evaluateOpeningPrinciples(const Board &board);
+    static Score evaluateCenterControl(const Board &board);
+    static Score evaluateDevelopment(const Board &board);
+    static Score evaluateCastlingRights(const Board &board);
+    static Score evaluateEarlyQueen(const Board &board);
+
+    // NEW: Endgame evaluation
+    static Score evaluateEndgame(const Board &board);
+    static Score evaluateRookOnOpenFile(const Board &board);
 
     // Game phase detection
     static int getGamePhase(const Board &board);
@@ -110,16 +139,16 @@ private:
         -5, 0, 0, 0, 0, 0, 0, -5,
         0, 0, 0, 5, 5, 0, 0, 0};
 
-    // Queen PST
+    // Queen PST - FIXED: Penalty for early development (Python v2.3.0)
     static constexpr Score QUEEN_PST_MG[64] = {
-        -20, -10, -10, -5, -5, -10, -10, -20,
-        -10, 0, 0, 0, 0, 0, 0, -10,
-        -10, 0, 5, 5, 5, 5, 0, -10,
-        -5, 0, 5, 5, 5, 5, 0, -5,
-        0, 0, 5, 5, 5, 5, 0, -5,
-        -10, 5, 5, 5, 5, 5, 0, -10,
-        -10, 0, 5, 0, 0, 0, 0, -10,
-        -20, -10, -10, -5, -5, -10, -10, -20};
+        -20, -10, -10, -5, -5, -10, -10, -20,   // Rank 1: back rank OK
+        -10, -20, -20, -20, -20, -20, -20, -10, // Rank 2: penalty -20
+        -10, -20, -10, -10, -10, -10, -20, -10, // Rank 3: penalty -20/-10
+        -5, -10, -5, 0, 0, -5, -10, -5,         // Rank 4: penalty -10/-5
+        0, -5, 0, 5, 5, 0, -5, 0,               // Rank 5: slight bonus
+        -10, -5, 0, 5, 5, 0, -5, -10,           // Rank 6: average
+        -10, -10, -5, 0, 0, -5, -10, -10,       // Rank 7: penalty
+        -20, -10, -10, -5, -5, -10, -10, -20};  // Rank 8: back rank OK
 
     static constexpr Score QUEEN_PST_EG[64] = {
         -20, -10, -10, -5, -5, -10, -10, -20,

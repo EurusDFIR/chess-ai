@@ -119,6 +119,12 @@ private:
     bool canLateMoveReduce(const Move &move, int depth, int moveIndex, bool pvNode);
     int getReduction(int depth, int moveIndex, bool pvNode);
 
+    // NEW: Advanced search techniques (Python v2.4.0)
+    bool isSingularMove(Board &board, const Move &ttMove, Score ttScore, int depth, int ply, Score beta);
+    bool tryMultiCut(Board &board, int depth, Score beta, int ply);
+    Move doInternalIterativeDeepening(Board &board, int depth, Score alpha, Score beta, int ply);
+    bool tryProbCut(Board &board, int depth, Score beta, int ply, Score &probcutScore);
+
     // Time management
     bool shouldStop();
     int getElapsedTime() const;

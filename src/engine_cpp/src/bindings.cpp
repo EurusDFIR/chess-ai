@@ -232,11 +232,29 @@ PYBIND11_MODULE(chess_engine, m)
      // EVALUATION
      // ========================================================================
 
+     py::class_<Evaluator::EvalBreakdown>(m, "EvalBreakdown")
+         .def_readonly("material", &Evaluator::EvalBreakdown::material)
+         .def_readonly("pst", &Evaluator::EvalBreakdown::pst)
+         .def_readonly("pawn_structure", &Evaluator::EvalBreakdown::pawnStructure)
+         .def_readonly("king_safety", &Evaluator::EvalBreakdown::kingSafety)
+         .def_readonly("mobility", &Evaluator::EvalBreakdown::mobility)
+         .def_readonly("threats", &Evaluator::EvalBreakdown::threats)
+         .def_readonly("opening_principles", &Evaluator::EvalBreakdown::openingPrinciples)
+         .def_readonly("endgame", &Evaluator::EvalBreakdown::endgame)
+         .def_readonly("rooks_on_open_file", &Evaluator::EvalBreakdown::rooksOnOpenFile)
+         .def_readonly("total", &Evaluator::EvalBreakdown::total)
+         .def("__repr__", [](const Evaluator::EvalBreakdown &e)
+              { return "<EvalBreakdown total=" + std::to_string(e.total) + "cp>"; });
+
      py::class_<Evaluator>(m, "Evaluator")
          .def_static("evaluate", &Evaluator::evaluate,
                      "Evaluate position from side to move perspective",
                      py::arg("board"),
-                     "Returns evaluation score in centipawns");
+                     "Returns evaluation score in centipawns")
+         .def_static("evaluate_detailed", &Evaluator::evaluateDetailed,
+                     "Get detailed evaluation breakdown",
+                     py::arg("board"),
+                     "Returns EvalBreakdown with component scores");
 
      // ========================================================================
      // MOVE GENERATION

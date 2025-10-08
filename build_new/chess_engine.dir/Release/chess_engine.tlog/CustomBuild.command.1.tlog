@@ -1,0 +1,10 @@
+^R:\_DOCUMENTS\_TDMU\KIEN_THUC_TDMU\3_YEAR_HK2\TRITUENT\CHESS-AI\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SR:/_Documents/_TDMU/KIEN_THUC_TDMU/3_year_HK2/TriTueNT/chess-ai -BR:/_Documents/_TDMU/KIEN_THUC_TDMU/3_year_HK2/TriTueNT/chess-ai/build_new --check-stamp-file R:/_Documents/_TDMU/KIEN_THUC_TDMU/3_year_HK2/TriTueNT/chess-ai/build_new/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

@@ -1,0 +1,7 @@
+R:\_Documents\_TDMU\KIEN_THUC_TDMU\3_year_HK2\TriTueNT\chess-ai\src\engine_cpp\src\board.cpp;R:\_Documents\_TDMU\KIEN_THUC_TDMU\3_year_HK2\TriTueNT\chess-ai\build_new\chess_engine.dir\Release\board.obj
+R:\_Documents\_TDMU\KIEN_THUC_TDMU\3_year_HK2\TriTueNT\chess-ai\src\engine_cpp\src\movegen.cpp;R:\_Documents\_TDMU\KIEN_THUC_TDMU\3_year_HK2\TriTueNT\chess-ai\build_new\chess_engine.dir\Release\movegen.obj
+R:\_Documents\_TDMU\KIEN_THUC_TDMU\3_year_HK2\TriTueNT\chess-ai\src\engine_cpp\src\evaluation.cpp;R:\_Documents\_TDMU\KIEN_THUC_TDMU\3_year_HK2\TriTueNT\chess-ai\build_new\chess_engine.dir\Release\evaluation.obj
+R:\_Documents\_TDMU\KIEN_THUC_TDMU\3_year_HK2\TriTueNT\chess-ai\src\engine_cpp\src\search.cpp;R:\_Documents\_TDMU\KIEN_THUC_TDMU\3_year_HK2\TriTueNT\chess-ai\build_new\chess_engine.dir\Release\search.obj
+R:\_Documents\_TDMU\KIEN_THUC_TDMU\3_year_HK2\TriTueNT\chess-ai\src\engine_cpp\src\transposition.cpp;R:\_Documents\_TDMU\KIEN_THUC_TDMU\3_year_HK2\TriTueNT\chess-ai\build_new\chess_engine.dir\Release\transposition.obj
+R:\_Documents\_TDMU\KIEN_THUC_TDMU\3_year_HK2\TriTueNT\chess-ai\src\engine_cpp\src\types.cpp;R:\_Documents\_TDMU\KIEN_THUC_TDMU\3_year_HK2\TriTueNT\chess-ai\build_new\chess_engine.dir\Release\types.obj
+R:\_Documents\_TDMU\KIEN_THUC_TDMU\3_year_HK2\TriTueNT\chess-ai\src\engine_cpp\src\bindings.cpp;R:\_Documents\_TDMU\KIEN_THUC_TDMU\3_year_HK2\TriTueNT\chess-ai\build_new\chess_engine.dir\Release\bindings.obj

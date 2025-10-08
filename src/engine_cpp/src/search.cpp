@@ -131,6 +131,31 @@ Score SearchEngine::alphaBeta(Board &board, int depth, Score alpha, Score beta, 
 
     Move ttMove = ttHit ? ttEntry.bestMove : Move();
 
+    // NEW: Probcut - prove beta cutoff with shallow search
+    // DISABLED FOR SEGFAULT DEBUG
+    /*
+    if (!pvNode && !inCheck && depth >= 5 && ply > 0)
+    {
+        Score probcutScore;
+        if (tryProbCut(board, depth, beta, ply, probcutScore))
+        {
+            return probcutScore;
+        }
+    }
+    */
+
+    // NEW: Multi-Cut Pruning - early beta cutoff
+    // DISABLED FOR SEGFAULT DEBUG
+    /*
+    if (!pvNode && !inCheck && depth >= 6 && ply > 0)
+    {
+        if (tryMultiCut(board, depth, beta, ply))
+        {
+            return beta;
+        }
+    }
+    */
+
     // Null move pruning
     if (!pvNode && !inCheck && depth >= 3 && canNullMovePrune(board, depth, beta))
     {
@@ -140,6 +165,15 @@ Score SearchEngine::alphaBeta(Board &board, int depth, Score alpha, Score beta, 
             return beta;
         }
     }
+
+    // NEW: Internal Iterative Deepening - get move ordering when no TT move
+    // DISABLED FOR SEGFAULT DEBUG
+    /*
+    if (pvNode && depth >= 6 && ttMove.isNull() && !inCheck)
+    {
+        ttMove = doInternalIterativeDeepening(board, depth, alpha, beta, ply);
+    }
+    */
 
     // Internal iterative deepening
     // (Skipped for simplicity)
@@ -181,6 +215,19 @@ Score SearchEngine::alphaBeta(Board &board, int depth, Score alpha, Score beta, 
         Score score;
         bool givesCheck = board.isCheck();
 
+        // NEW: Singular Extensions - extend search if move is clearly best
+        // DISABLED FOR SEGFAULT DEBUG
+        int extension = 0;
+        /*
+        if (pvNode && depth >= 8 && move == ttMove && ttHit && !inCheck)
+        {
+            if (isSingularMove(board, ttMove, ttEntry.score, depth, ply, beta))
+            {
+                extension = 1; // Extend by 1 ply
+            }
+        }
+        */
+
         // Late move reductions
         bool reduced = false;
         if (moveCount > 3 && depth >= 3 && !pvNode && !inCheck && !givesCheck)
@@ -188,7 +235,7 @@ Score SearchEngine::alphaBeta(Board &board, int depth, Score alpha, Score beta, 
             if (canLateMoveReduce(move, depth, moveCount, pvNode))
             {
                 int reduction = getReduction(depth, moveCount, pvNode);
-                score = -alphaBeta(board, depth - 1 - reduction, -alpha - 1, -alpha, false, ply + 1);
+                score = -alphaBeta(board, depth - 1 - reduction + extension, -alpha - 1, -alpha, false, ply + 1);
                 reduced = true;
             }
         }
@@ -199,17 +246,17 @@ Score SearchEngine::alphaBeta(Board &board, int depth, Score alpha, Score beta, 
             if (pvNode && moveCount == 1)
             {
                 // PV node - full window
-                score = -alphaBeta(board, depth - 1, -beta, -alpha, true, ply + 1);
+                score = -alphaBeta(board, depth - 1 + extension, -beta, -alpha, true, ply + 1);
             }
             else
             {
                 // Zero window search
-                score = -alphaBeta(board, depth - 1, -alpha - 1, -alpha, false, ply + 1);
+                score = -alphaBeta(board, depth - 1 + extension, -alpha - 1, -alpha, false, ply + 1);
 
                 // Re-search if needed
                 if (score > alpha && score < beta)
                 {
-                    score = -alphaBeta(board, depth - 1, -beta, -alpha, true, ply + 1);
+                    score = -alphaBeta(board, depth - 1 + extension, -beta, -alpha, true, ply + 1);
                 }
             }
         }
@@ -612,4 +659,161 @@ Score SearchEngine::scoreFromTT(Score score, int ply)
         return score + ply;
     }
     return score;
+}
+
+// ============================================================================
+// NEW: Advanced Search Techniques (Python v2.4.0)
+// ============================================================================
+
+// 1. Singular Extensions
+// Extends search when one move is significantly better than all others
+bool SearchEngine::isSingularMove(Board &board, const Move &ttMove, Score ttScore, int depth, int ply, Score beta)
+{
+    if (depth < 6)
+        return false;
+    if (ttMove.isNull())
+        return false;
+
+    // Reduced depth for verification search
+    int rDepth = std::max(1, depth - 4);
+    Score rBeta = ttScore - depth * 2; // Margin
+
+    // Generate and search all other moves
+    MoveList moves;
+    MoveGenerator::generateLegalMoves(board, moves);
+
+    int searched = 0;
+    for (const Move &move : moves)
+    {
+        // Skip the TT move
+        if (move == ttMove)
+            continue;
+
+        board.makeMove(move);
+        Score score = -alphaBeta(board, rDepth, -rBeta - 1, -rBeta, false, ply + 1);
+        board.unmakeMove(move);
+
+        // If any other move is close to ttMove, not singular
+        if (score >= rBeta)
+            return false;
+
+        searched++;
+        if (searched >= 4)
+            break; // Check only first 4 moves
+    }
+
+    // TT move is singular - extend it
+    return true;
+}
+
+// 2. Multi-Cut Pruning
+// Early beta cutoff when multiple moves produce cutoffs in shallow search
+bool SearchEngine::tryMultiCut(Board &board, int depth, Score beta, int ply)
+{
+    if (depth < 5)
+        return false;
+
+    int C = 3; // Need 3 cutoffs
+    int M = 6; // Check first 6 moves
+    int R = 2; // Reduction depth
+
+    MoveList moves;
+    MoveGenerator::generateLegalMoves(board, moves);
+
+    if (moves.size() < M)
+        return false;
+
+    // Order moves
+    orderMoves(board, moves, Move(), killerMoves[ply][0], killerMoves[ply][1], ply);
+
+    int cutoffs = 0;
+    int searched = 0;
+
+    for (const Move &move : moves)
+    {
+        if (searched >= M)
+            break;
+
+        board.makeMove(move);
+        Score score = -alphaBeta(board, depth - R - 1, -beta, -beta + 1, false, ply + 1);
+        board.unmakeMove(move);
+
+        searched++;
+
+        if (score >= beta)
+        {
+            cutoffs++;
+            if (cutoffs >= C)
+            {
+                // Multi-cut: return beta
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+// 3. Internal Iterative Deepening (IID)
+// Get better move ordering when no TT move available
+Move SearchEngine::doInternalIterativeDeepening(Board &board, int depth, Score alpha, Score beta, int ply)
+{
+    if (depth < 6)
+        return Move();
+
+    // Search with reduced depth to get a good move
+    int iidDepth = depth - 2;
+    alphaBeta(board, iidDepth, alpha, beta, true, ply);
+
+    // Probe TT for best move from shallow search
+    TTEntry ttEntry;
+    if (tt.probe(board.getHash(), iidDepth, alpha, beta, ttEntry))
+    {
+        return ttEntry.bestMove;
+    }
+
+    return Move();
+}
+
+// 4. Probcut
+// Prove beta cutoff with shallow search
+bool SearchEngine::tryProbCut(Board &board, int depth, Score beta, int ply, Score &probcutScore)
+{
+    if (depth < 5)
+        return false;
+
+    // Probcut parameters
+    int probcutDepth = depth - 4;
+    Score probcutBeta = beta + 100; // Margin
+
+    MoveList moves;
+    MoveGenerator::generateLegalMoves(board, moves);
+
+    // Order moves
+    orderMoves(board, moves, Move(), killerMoves[ply][0], killerMoves[ply][1], ply);
+
+    // Try good moves only
+    int maxMoves = std::min(4, (int)moves.size());
+
+    for (int i = 0; i < maxMoves; i++)
+    {
+        const Move &move = moves[i];
+
+        // Only try tactical moves for probcut
+        if (!move.isCapture() && !move.isPromotion())
+            continue;
+
+        board.makeMove(move);
+        Score score = -alphaBeta(board, probcutDepth, -probcutBeta, -probcutBeta + 1, false, ply + 1);
+        board.unmakeMove(move);
+
+        if (score >= probcutBeta)
+        {
+            // Probcut successful
+            probcutScore = score;
+            return true;
+        }
+    }
+
+    return false;
 }
