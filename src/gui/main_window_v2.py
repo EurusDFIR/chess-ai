@@ -170,6 +170,9 @@ class ChessGame:
         # Music
         self._load_music()
         
+        # Background images
+        self._load_background()
+        
         # Home screen UI
         self._create_home_ui()
     
@@ -345,6 +348,21 @@ class ChessGame:
             except:
                 print("[Warning] Could not load music")
     
+    def _load_background(self):
+        """Load background images"""
+        self.home_background = None
+        bg_path = os.path.join(os.path.dirname(__file__), "assets", "backgrounds", 
+                              "home_background.png")
+        if os.path.exists(bg_path):
+            try:
+                self.home_background = pygame.image.load(bg_path).convert()
+                # Scale to window size
+                self.home_background = pygame.transform.scale(self.home_background, 
+                                                            (WINDOW_WIDTH, WINDOW_HEIGHT))
+                print("[Background] Home background loaded")
+            except:
+                print("[Warning] Could not load home background")
+    
     def start_game(self):
         """Start a new game"""
         self.current_screen = "game"
@@ -515,8 +533,9 @@ class ChessGame:
     
     def _draw_home(self):
         """Draw home screen"""
-        # Could add background image here
-        pass
+        # Draw background image
+        if self.home_background:
+            self.screen.blit(self.home_background, (0, 0))
     
     def _draw_game(self):
         """Draw game screen"""
