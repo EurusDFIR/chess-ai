@@ -23,7 +23,7 @@ from src.gui.components.evaluation_bar import EvaluationBar
 from src.gui.components.analysis_panel import AnalysisPanel
 
 # AI
-from src.ai.minimax_fast import get_best_move  # OPTIMIZED: Use fast engine (30-50% faster)
+from src.ai.minimax_v2_4 import get_best_move  # USE v2.4: Better move quality (tactical awareness)
 from src.ai.opening_book import OpeningBook
 from src.ai.analysis_engine import AnalysisEngine
 
@@ -95,9 +95,9 @@ def ai_move_threaded(board_copy, depth=4, time_limit=5.0):
             
             # If no book move, use Python engine
             if not move:
-                # Fast engine uses max_time instead of time_limit
-                move, info = get_best_move(board_copy, depth=depth, max_time=time_limit)
-                print(f"[Fast Engine] Move: {move} (depth {depth}, nodes: {info['nodes']:,}, nps: {info['nps']:,.0f})")
+                # v2.4 engine uses time_limit and returns only move (not tuple)
+                move = get_best_move(board_copy, depth=depth, time_limit=time_limit)
+                print(f"[Python v2.4] Move: {move} (depth {depth})")
             
             ai_move_queue.put(move)
         except Exception as e:
