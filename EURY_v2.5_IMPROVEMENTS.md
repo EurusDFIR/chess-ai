@@ -3,11 +3,13 @@
 ## 📊 Current Status:
 
 ### **v2.5 (Released):**
+
 - **Strength**: ~2300-2400 Elo
 - **New Technique**: Correction History (+100-150 Elo) ✅
 - **Status**: Released and stable
 
 ### **v2.6 (In Development):**
+
 - **Strength**: ~2480-2690 Elo (Target: +180-290 Elo gain)
 - **New Techniques**: 6 advanced Stockfish techniques ✅ IMPLEMENTED
 - **Status**: Ready for integration
@@ -19,27 +21,32 @@
 ### ✅ **COMPLETED & TESTED:**
 
 1. **Late Move Pruning (LMP)** - Stockfish Style (+40-60 Elo)
+
    - Dynamic thresholds: `(3 + depth²) / (2 - improving)`
    - More aggressive than basic LMR
    - Tested & working ✅
 
 2. **Enhanced Razoring** (+30-50 Elo)
+
    - Stockfish-tuned margins (250-650cp by depth)
    - Drop to qsearch on hopeless positions
    - Tested & working ✅
 
 3. **History Gravity** (+20-40 Elo)
+
    - Decay formula: `new = old + bonus - (old * |bonus| / 512)`
    - Periodic global decay: 7/8 every 4096 nodes
    - Prevents stale data
    - Tested & working ✅
 
 4. **Enhanced Aspiration Windows** (+30-50 Elo)
+
    - Stockfish widening: `delta = 11 + alpha² / 15620`
    - Exponential widening on fails
    - Tested & working ✅
 
 5. **Continuation History** (+40-60 Elo)
+
    - Track move sequences: `(prev_move, current_move) -> bonus`
    - "If A then B is good" logic
    - Dramatically improves move ordering
@@ -51,6 +58,7 @@
    - Tested & working ✅
 
 **Test Results:** ALL TESTS PASSED ✅
+
 - See: `test_stockfish_techniques.py`
 - Documentation: `STOCKFISH_TECHNIQUES_v2.6.md`
 

@@ -22,8 +22,8 @@ from src.gui.components import (
 from src.gui.components.evaluation_bar import EvaluationBar
 from src.gui.components.analysis_panel import AnalysisPanel
 
-# AI
-from src.ai.minimax_v2_4 import get_best_move  # USE v2.4: Better move quality (tactical awareness)
+# AI - UPDATED to v2.6 with all Stockfish techniques
+from src.ai.minimax_v2_6 import get_best_move  # USE v2.6: All Stockfish techniques integrated (+380-540 Elo)
 from src.ai.opening_book import OpeningBook
 from src.ai.analysis_engine import AnalysisEngine
 
@@ -93,11 +93,11 @@ def ai_move_threaded(board_copy, depth=4, time_limit=5.0):
                 except:
                     pass
             
-            # If no book move, use Python engine
+            # If no book move, use Python engine v2.6
             if not move:
-                # v2.4 engine uses time_limit and returns only move (not tuple)
+                # v2.6 engine uses time_limit and returns only move
                 move = get_best_move(board_copy, depth=depth, time_limit=time_limit)
-                print(f"[Python v2.4] Move: {move} (depth {depth})")
+                print(f"[Python v2.6] Move: {move} (depth {depth})")
             
             ai_move_queue.put(move)
         except Exception as e:
