@@ -116,6 +116,18 @@ class EnhancedSearchInfo(SearchInfo):
         if not hasattr(self, 'pv'):
             self.pv = [[None] * MAX_PLY for _ in range(MAX_PLY)]
             self.pv_length = [0] * MAX_PLY
+        
+        # Initialize TT stats if not exists
+        if not hasattr(self, 'tt_hits'):
+            self.tt_hits = 0
+            self.cut_nodes = 0
+    
+    def update_pv(self, ply, move):
+        """Update Principal Variation."""
+        self.pv[ply][ply] = move
+        for i in range(ply + 1, self.pv_length[ply + 1]):
+            self.pv[ply][i] = self.pv[ply + 1][i]
+        self.pv_length[ply] = self.pv_length[ply + 1]
     
     def apply_history_gravity(self):
         """Apply gravity to history heuristic (Stockfish style)."""
@@ -356,7 +368,8 @@ def enhanced_aspiration_windows(board, max_depth, time_limit, info):
             # Success - score within window
             if alpha < score < beta:
                 best_score = score
-                if info.pv[0]:
+                # Get best move from PV
+                if info.pv[0] and info.pv[0][0]:
                     best_move = info.pv[0][0]
                 break
             
@@ -392,6 +405,13 @@ def enhanced_aspiration_windows(board, max_depth, time_limit, info):
         # Early exit if using 80% of time
         if elapsed > time_limit * 0.8:
             break
+    
+    # Fallback: if no best_move from PV, pick first legal move
+    if not best_move:
+        legal_moves = list(board.legal_moves)
+        if legal_moves:
+            best_move = legal_moves[0]
+            print("Warning: No best move from search, using first legal move")
     
     return best_move, best_score
 
